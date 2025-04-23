@@ -4,7 +4,7 @@
 This project focuses on identifying new tokens on the Solana blockchain, verifying their authenticity, and facilitating their trading.
 
 ## Installation and Setup
-To run this project, you'll need to install the required packages.
+To run this project, you'll need to install the required packages.  
 Follow the steps below:
 
 ### 1. Environment
@@ -28,5 +28,5 @@ source ~/.bashrc
 ```
 
 ### 2. Create a `.env` File
-In the main directory, rename the file `.env_examaple` to  `.env_examaple` and fill in the empty fields
+In the main directory, rename the file `.env_examaple` to  `.env` and fill in the empty fields.  
 The `.env` file will store sensitive information needed for interacting with the Solana blockchain, your wallet and various API services.
