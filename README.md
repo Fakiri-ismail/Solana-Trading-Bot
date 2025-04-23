@@ -20,23 +20,13 @@ pip install -r requirements.txt
 
 # Set the `PYTHONPATH` environment variable
 ## 1.Temporarily (For Current Session)
-export PYTHONPATH=/path/to/SolanaBot:$PYTHONPATH
+export PYTHONPATH=/path/to/solana-trading-bot:$PYTHONPATH
 ## 2.Permanently
 nano ~/.bashrc
-export PYTHONPATH=/path/to/SolanaBot:$PYTHONPATH
+export PYTHONPATH=/path/to/solana-trading-bot:$PYTHONPATH
 source ~/.bashrc
 ```
 
 ### 2. Create a `.env` File
-In the `resources` directory, create a file named `.env` and add the following parameters:
-```bash
-# SOL WALLET
-PUBLIC_KEY=
-PRIVATE_KEY=
-
-# API KEYS
-SHYFT_API_KEY=
-HELIUS_API_KEY=
-BIRDEYE_API_KEY=
-```
-The `.env` file will store sensitive information needed for interacting with the Solana blockchain and various API services.
+In the main directory, rename the file `.env_examaple` to  `.env_examaple` and fill in the empty fields
+The `.env` file will store sensitive information needed for interacting with the Solana blockchain, your wallet and various API services.
