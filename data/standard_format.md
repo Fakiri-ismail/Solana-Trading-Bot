@@ -1,5 +1,4 @@
-## Wallet Token Info Example
-<pre> 
+#### Wallet Token Info Example
 ```
 {
     "mint":"Hax9LTgsQkze1YFychnBLtFH8gYbQKtKfWKKg2SP6gdD",
@@ -8,5 +7,3 @@
     "decimals":9
 },
 ``` 
-</pre>
-
