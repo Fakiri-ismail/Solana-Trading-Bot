@@ -74,5 +74,9 @@ class WalletManager():
         for token in assets:
             if mint_or_symbol in [token["mint"], token["symbol"]]:
                 return token
-    
 
+    def buy_token(self):
+        pass
+
+    def sell_token(self):
+        pass
