@@ -1,6 +1,5 @@
 import requests, json, base64
 from solders.transaction import VersionedTransaction
-from exchanges.config import payer
 
 
 base_url = "https://lite-api.jup.ag/ultra/v1"
@@ -19,7 +18,7 @@ def get_order(input_mint: str, output_mint: str, amount: str, wallet_pub_key: st
     response.raise_for_status()
     return response.json()
 
-def sign_transaction(transaction: str):
+def sign_transaction(payer, transaction: str):
     # Deserialize the transaction
     transaction_bytes = base64.b64decode(transaction)
     unsigned_tx = VersionedTransaction.from_bytes(transaction_bytes)
