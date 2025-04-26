@@ -29,4 +29,7 @@ source ~/.bashrc
 
 ### 2. Create a `.env` File
 In the main directory, rename the file `.env_examaple` to  `.env` and fill in the empty fields.  
-The `.env` file will store sensitive information needed for interacting with the Solana blockchain, your wallet and various API services.
+The `.env` file will store sensitive information needed for interacting with the Solana blockchain, your wallet, the database and various API services.
+
+### 3. Database configuration
+You can use any database you want, for this project I used the [Neon](https://neon.tech/) database.
