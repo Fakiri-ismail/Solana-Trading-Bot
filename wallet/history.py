@@ -7,9 +7,9 @@ from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL
 if __name__ == "__main__":
 
     my_wallet = WalletManager(WALLET_PUB_KEY, WALLET_PRIV_KEY)
-    wallet_usd_value = 0
     wallet_assets = my_wallet.get_assets()
-
+    
+    wallet_usd_value = 0
     for token in wallet_assets:
         # Toekn Info
         token_balance = token.get("balance", 0) / 10 ** token.get("decimals", 0)
@@ -28,4 +28,3 @@ if __name__ == "__main__":
         balance_usdt=round(wallet_usd_value,3),
         balance_sol=round(wallet_sol_value,5)
     )
-    print("Done!")
