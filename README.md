@@ -18,11 +18,9 @@ source venv/bin/activate
 # Install required packages
 pip install -r requirements.txt
 
-# Set the `PYTHONPATH` environment variable
-## 1.Temporarily (For Current Session)
-export PYTHONPATH=/path/to/solana-trading-bot:$PYTHONPATH
-## 2.Permanently
+# Set the `SOL_PROJECT_PATH` and `PYTHONPATH`
 nano ~/.bashrc
+export SOL_PROJECT_PATH="/path/to/solana-trading-bot"
 export PYTHONPATH=/path/to/solana-trading-bot:$PYTHONPATH
 source ~/.bashrc
 ```
