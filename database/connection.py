@@ -58,7 +58,8 @@ def init_db():
             id SERIAL PRIMARY KEY,
             mint VARCHAR(255) NOT NULL,
             symbol VARCHAR(50),
-            sale_price DECIMAL(20, 8)  NOT NULL,
+            buy_price DECIMAL(20, 8)  NOT NULL,
+            sell_price DECIMAL(20, 8)  NOT NULL,
             usdt_value DECIMAL(20, 8) NOT NULL,
             date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
         )

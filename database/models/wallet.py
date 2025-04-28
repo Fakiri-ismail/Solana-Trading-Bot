@@ -27,7 +27,8 @@ class TradingHistory:
     id: Optional[int] = None
     mint: str = ""
     symbol: str = ""
-    sale_price: Optional[Decimal] = None
+    buy_price: Optional[Decimal] = None
+    sell_price: Optional[Decimal] = None
     usdt_value: Decimal = Decimal('0')
     date: datetime = None
     

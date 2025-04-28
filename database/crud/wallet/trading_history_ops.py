@@ -6,19 +6,19 @@ from database.models.wallet import TradingHistory
 
 
 def create_trading_history(mint: str, symbol: str, usdt_value: Decimal,
-                         sale_price: Optional[Decimal] = None, 
-                         date: Optional[datetime] = None) -> int:
+                           buy_price: Optional[Decimal] = None, sell_price: Optional[Decimal] = None,
+                           date: Optional[datetime] = None) -> int:
     if date is None:
         date = datetime.now()
         
     with get_cursor() as cursor:
         cursor.execute(
             """
-            INSERT INTO trading_history (mint, symbol, sale_price, usdt_value, date)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO trading_history (mint, symbol, buy_price, sell_price, usdt_value, date)
+            VALUES (%s, %s, %s, %s, %s, %s)
             RETURNING id
             """,
-            (mint, symbol, sale_price, usdt_value, date)
+            (mint, symbol, buy_price, sell_price, usdt_value, date)
         )
         return cursor.fetchone()['id']
 
@@ -39,7 +39,8 @@ def get_trading_history(history_id: int) -> Optional[TradingHistory]:
                 mint=data['mint'],
                 symbol=data['symbol'],
                 usdt_value=data['usdt_value'],
-                sale_price=data['sale_price'],
+                buy_price=data['buy_price'],
+                sell_price=data['sell_price'],
                 date=data['date']
             )
         return None
@@ -61,7 +62,8 @@ def get_all_trading_history(limit: int = 100, offset: int = 0) -> List[TradingHi
                 mint=row['mint'],
                 symbol=row['symbol'],
                 usdt_value=row['usdt_value'],
-                sale_price=row['sale_price'],
+                buy_price=row['buy_price'],
+                sell_price=row['sell_price'],
                 date=row['date']
             )
             for row in cursor.fetchall()
@@ -84,7 +86,8 @@ def get_trading_history_by_token(mint: str) -> List[TradingHistory]:
                 mint=row['mint'],
                 symbol=row['symbol'],
                 usdt_value=row['usdt_value'],
-                sale_price=row['sale_price'],
+                buy_price=row['buy_price'],
+                sell_price=row['sell_price'],
                 date=row['date']
             )
             for row in cursor.fetchall()
