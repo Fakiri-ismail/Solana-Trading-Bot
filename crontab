@@ -1,0 +1,4 @@
+SOL_PROJECT_PATH=/home/hunter/Desktop/Solana-Trading-Bot
+
+0 */8 * * * $SOL_PROJECT_PATH/scripts/wallet_history.sh >> $SOL_PROJECT_PATH/test.log 2>&1
+*/5 * * * * $SOL_PROJECT_PATH/scripts/trading.sh >> $SOL_PROJECT_PATH/test.log 2>&1
