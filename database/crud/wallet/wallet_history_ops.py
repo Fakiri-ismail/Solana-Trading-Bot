@@ -68,7 +68,7 @@ def delete_wallet_history(history_id: int) -> bool:
         )
         return cursor.rowcount > 0
 
-def get_all_wallet_history(limit: int = 100, offset: int = 0) -> list[WalletHistory]:
+def get_all_wallet_history(limit: int = 100, offset: int = 0):
     """
     Retrieves all wallet history entries.
     Args:
@@ -117,7 +117,7 @@ def get_latest_wallet_history() -> WalletHistory:
             )
         return None
 
-def get_wallet_history_by_date_range(start_date: datetime, end_date: datetime) -> list[WalletHistory]:
+def get_wallet_history_by_date_range(start_date: datetime, end_date: datetime):
     """
     Retrieves wallet history entries within a specific date range.
     Args:
