@@ -8,7 +8,7 @@ from solana.rpc.types import TxOpts
 from solana.rpc.commitment import Processed, Finalized
 from solana.rpc.async_api import AsyncClient
 
-from global_config import SOL_URI, HELIUS_RPC
+from global_config import SOL_URI
 
 
 base_url = "https://lite-api.jup.ag/swap/v1"
@@ -59,7 +59,7 @@ async def send_transaction(payer, swap_transaction):
         signed_tx = VersionedTransaction.populate(transaction.message, [signature])
 
         async with AsyncClient(SOL_URI) as async_client:
-            opts = TxOpts(skip_preflight=False, preflight_commitment=Processed, max_retries=2)
+            opts = TxOpts(skip_preflight=False, preflight_commitment=Finalized, max_retries=2)
             tx_id = await async_client.send_raw_transaction(txn=bytes(signed_tx), opts=opts)
             result = json.loads(tx_id.to_json()).get('result')
             return result          #txid.value
