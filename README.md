@@ -21,7 +21,7 @@ pip install -r requirements.txt
 # Set the `SOL_PROJECT_PATH` and `PYTHONPATH`
 nano ~/.bashrc
 export SOL_PROJECT_PATH="/path/to/solana-trading-bot"
-export PYTHONPATH=/path/to/solana-trading-bot:$PYTHONPATH
+export PYTHONPATH=$SOL_PROJECT_PATH:$$PYTHONPATH
 source ~/.bashrc
 ```
 
