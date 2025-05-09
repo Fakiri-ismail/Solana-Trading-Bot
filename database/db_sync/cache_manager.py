@@ -1,6 +1,6 @@
 import os, json
 from datetime import datetime
-from database.crud.wallet.wallet_tokens_ops import get_wallet_token, get_all_wallet_tokens
+from database.crud.wallet.wallet_tokens_ops import get_all_wallet_tokens
 from database.crud.wallet.wallet_tokens_ops import insert_wallet_token, delete_wallet_token
 
 
