@@ -10,6 +10,10 @@ def getJupPrice(mints: str, vs_token: str =USDC) -> dict:
     """
         
     url = f'https://lite-api.jup.ag/price/v2?ids={mints}&vsToken={vs_token}'
-    response = requests.get(url)
-    response.raise_for_status()
-    return response.json().get("data", {})
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json().get("data", {})
+    except requests.RequestException as e:
+        print(f"JUP API : Error fetching '{mints}' price\n >> {e}")
+        return {}

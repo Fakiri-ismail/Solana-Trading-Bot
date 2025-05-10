@@ -33,7 +33,11 @@ async def main():
 
     cache_mints = [t["mint"] for t in wallet_cache]
     for token in wallet_assets:
-        token_actual_price = float(getJupPrice(token["mint"]).get(token["mint"], {}).get("price", 0))
+        mint_price = getJupPrice(token["mint"]).get(token["mint"], {}).get("price", 0)
+        if not mint_price:
+            print(f"Price not found for {token['symbol']}")
+            continue
+        token_actual_price = float(mint_price)
         token_usd_value = token_actual_price * (token.get("balance", 0) / 10 ** token.get("decimals", 0))
         # Check if token already exists in cache
         if token["mint"] not in cache_mints:
