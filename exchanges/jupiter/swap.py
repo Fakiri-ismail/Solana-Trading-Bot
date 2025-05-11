@@ -61,8 +61,7 @@ async def send_transaction(payer, swap_transaction):
         async with AsyncClient(SOL_URI) as async_client:
             opts = TxOpts(skip_preflight=False, preflight_commitment=Finalized, max_retries=2)
             tx_id = await async_client.send_raw_transaction(txn=bytes(signed_tx), opts=opts)
-            result = json.loads(tx_id.to_json()).get('result')
-            return result          #txid.value
+            return json.loads(tx_id.to_json()).get('result')          #txid.value
     except RPCException as e:
         # Extract the message
         msg = re.search(r'message: "(.*?)"', e)

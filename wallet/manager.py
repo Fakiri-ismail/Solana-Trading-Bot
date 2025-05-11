@@ -113,6 +113,6 @@ class WalletManager():
             await asyncio.sleep(5)
 
         return {
-            "transactionId": tx_id,
+            "tx_signature": tx_id,
             "status": tx_status
         }
