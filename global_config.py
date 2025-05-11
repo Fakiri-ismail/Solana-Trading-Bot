@@ -9,7 +9,9 @@ WALLET_PUB_KEY = os.getenv("PUBLIC_KEY")
 WALLET_PRIV_KEY = os.getenv("PRIVATE_KEY")
 
 # URLS
-HELIUS_RPC = f"https://mainnet.helius-rpc.com/?api-key={os.getenv('HELIUS_API_KEY')}"
+HELIUS_API_KEY = os.getenv("HELIUS_API_KEY")
+HELIUS_API = f"https://api.helius.xyz/v0"
+HELIUS_RPC = f"https://mainnet.helius-rpc.com/?api-key={HELIUS_API_KEY}"
 SOL_URI = 'https://api.mainnet-beta.solana.com'     # "https://api.devnet.solana.com"
 SOL_WSS = 'wss://api.mainnet-beta.solana.com'       # "wss://api.devnet.solana.com"
 
