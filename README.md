@@ -31,3 +31,5 @@ The `.env` file will store sensitive information needed for interacting with the
 
 ### 3. Database configuration
 You can use any database you want, for this project I used the [Neon](https://neon.tech/) database.
+
+### 4. Telegram Bot
