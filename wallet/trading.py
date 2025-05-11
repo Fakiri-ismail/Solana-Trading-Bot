@@ -1,11 +1,15 @@
 import asyncio
 from wallet.manager import WalletManager
+from wallet.helpers import get_swap_data
 from exchanges.jupiter.price import getJupPrice
 from database.crud.wallet.wallet_tokens_ops import get_all_wallet_tokens
 from database.crud.wallet.trading_history_ops import create_trading_history
 from database.db_sync.cache_manager import load_wallet_cache, save_wallet_cache, sync_with_db
+from telegram.hunter_bot import HunterBot
 from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL, USDC
 
+
+hunter = HunterBot()
 
 async def main():
     # Load the wallet cache
@@ -61,17 +65,27 @@ async def main():
 
                 if token_actual_price >= threshold_upper or token_actual_price <= threshold_lower:
                     result = await my_wallet.sell_token(mint=token["mint"], pct_amount=100)
+                    swap_info ={
+                        "status": result.get("status"),
+                        "transactionId": result.get("tx_signature"),
+                        "symbol": token["symbol"],
+                        "swapData": None
+                    }
                     if result.get("status"):
+                        # Get the swap data
+                        swap_data = get_swap_data(result.get("tx_signature"))
+                        # Send telegram message
+                        swap_info["swapData"] = swap_data
+                        swap_usdt_value = int(swap_data['tokenOutput']['amount']) / 10 ** int(swap_data['tokenOutput']['decimals'])
                         create_trading_history(
                             mint=token["mint"],
                             symbol=token["symbol"], 
-                            usdt_value=token_usd_value,
+                            usdt_value=swap_usdt_value,
                             buy_price=float(cache_token["purchase_price"]),
                             sell_price=token_actual_price
                         )
-                        print(token["symbol"], "sold!")
-                    else:
-                        print(token["symbol"], ": Transaction failed!")
+
+                    hunter.send_swap_message(swap_info)
 
     save_wallet_cache(wallet_cache)
 
