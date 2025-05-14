@@ -3,7 +3,7 @@ from typing import List
 from solders.pubkey import Pubkey
 from solders.signature import Signature
 from solana.rpc.api import Client
-from global_config import SOL_URI, HELIUS_API, HELIUS_API_KEY
+from global_config import SOL_URI, HELIUS_API, HELIUS_API_KEY, WSOL
 
 
 sol_client = Client(SOL_URI)
@@ -103,34 +103,70 @@ def get_swap_data(tx_signature: str) -> dict:
         return None
     transaction_data = transaction_data[0]
 
-    # Check if the transaction has an error or if it doesn't contain swap data
+    # Check if the transaction has an error 
     transaction_error = transaction_data.get("transactionError")
-    swap_data = transaction_data.get("events", {}).get("swap", {})
-    if transaction_error or not swap_data:
+    if transaction_error:
         return None
     
-    # Extract the swap data
-    token_input = swap_data.get("tokenInputs")[0] if swap_data.get("tokenInputs") else {}
-    token_output = swap_data.get("tokenOutputs")[0] if swap_data.get("tokenOutputs") else {}
+    # Check if the transaction is a swap transaction
+    swap_data = transaction_data.get("events", {}).get("swap", {})
+    if not swap_data:
+        # Extract the transfer data
+        transfer_data = transaction_data.get("tokenTransfers")
+        if len(transfer_data) == 2:
+            token_input = {
+            "mint": transfer_data[0].get("mint"),
+            "amount": float(transfer_data[0].get("tokenAmount")),
+            "decimals": 0
+            }
+            token_output = {
+            "mint": transfer_data[1].get("mint"),
+            "amount": float(transfer_data[1].get("tokenAmount")),
+            "decimals": 0
+            }
+    else:
+        # Extract the swap data
+        ## Extract the token input data
+        if swap_data.get("nativeInput"):
+            token_input = {
+                "mint": WSOL,
+                "amount": int(swap_data.get("nativeInput", {}).get("amount", 0)),
+                "decimals": 9
+            }
+        else:
+            token_input_data = swap_data.get("tokenInputs")[0] if swap_data.get("tokenInputs") else {}
+            token_input = {
+                "mint": token_input_data.get("mint"),
+                "amount": int(token_input_data.get("rawTokenAmount", {}).get("tokenAmount", 0)),
+                "decimals": token_input_data.get("rawTokenAmount", {}).get("decimals")
+            }
+        
+        ## Extract the token output data
+        if swap_data.get("nativeOutput"):
+            token_output = {
+                "mint": WSOL,
+                "amount": int(swap_data.get("nativeOutput", {}).get("amount", 0)),
+                "decimals": 9
+            }
+        else:
+            token_output_data = swap_data.get("tokenOutputs")[0] if swap_data.get("tokenOutputs") else {}
+            token_output = {
+                "mint": token_output_data.get("mint"),
+                "amount": int(token_output_data.get("rawTokenAmount", {}).get("tokenAmount", 0)),
+                "decimals": token_output_data.get("rawTokenAmount", {}).get("decimals")
+            }
+
     return {
         "description": transaction_data.get("description"),
         "fee": transaction_data.get("fee"),
-        "tokenInput": {
-            "mint": token_input.get("mint"),
-            "amount": token_input.get("rawTokenAmount", {}).get("tokenAmount"),
-            "decimals": token_input.get("rawTokenAmount", {}).get("decimals")
-        },
-        "tokenOutput": {
-            "mint": token_output.get("mint"),
-            "amount": token_output.get("rawTokenAmount", {}).get("tokenAmount"),
-            "decimals": token_output.get("rawTokenAmount", {}).get("decimals")
-        }
+        "tokenInput": token_input,
+        "tokenOutput": token_output
     }
 
 
 if __name__ == "__main__":
     # Example usage
-    tx_passed = "5pNsKQCV6vfdcZjWeY8nTJDoVkXq7RiyHAHuNpAPDeDuHwLNZEvdBhLTpuM8aocYaL8Cx5jhUmSTGddPjTFg1ZkP"
+    tx_passed = "2KUQ3ZdUYa5FthTFT3YzNFCnsGzj7XbtxrWfnGSfj7hHSt8PN96gEba3Kc7W2p6LU38e3TW8amaGPFpjPcWqNQtU"
     tx_failed = "R6quTum5ruRqtbztZ3mcitRuS2abDGFBDKyX9k6Mi2t4riKCyVX78iYWSJ7B1UgTKUY4U14oAJKbdEt3iD19eSe"
     tx_not_exist = "5pNsKQCV6vfdcZjWeY8nTJDoVkXq7RiyHAHuNpAPDeDuHwLNZEvdBhLmpuM8aocYaL8Cx5jhUmSTGddPjTFg1ZkP"
     print(get_swap_data(tx_not_exist))
