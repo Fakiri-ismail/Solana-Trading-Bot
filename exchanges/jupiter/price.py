@@ -17,3 +17,13 @@ def getJupPrice(mints: str, vs_token: str =USDC) -> dict:
     except requests.RequestException as e:
         print(f"JUP API : Error fetching '{mints}' price\n >> {e}")
         return {}
+
+
+if __name__ == "__main__":
+    # Example usage
+    from global_config import WSOL
+    price = getJupPrice(WSOL).get(WSOL, {}).get("price", 0)
+    if not price:
+        raise Exception(f"Price not found for {WSOL}")
+    print(price)
+    
