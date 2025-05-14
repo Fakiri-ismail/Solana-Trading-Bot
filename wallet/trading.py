@@ -72,15 +72,18 @@ async def main():
                         "status": result.get("status"),
                         "transactionId": result.get("tx_signature"),
                         "symbol": token["symbol"],
-                        "swapData": None
+                        "swapData": None,
+                        "usdValue": 0
                     }
                     if result.get("status"):
                         # Get the swap data
                         swap_data = get_swap_data(result.get("tx_signature"))
-                        # Send telegram message
                         swap_info["swapData"] = swap_data
+                        
                         swap_sol_value = swap_data['tokenOutput']['amount'] / 10 ** swap_data['tokenOutput']['decimals']
-                        swap_usdt_value = swap_sol_value * sol_price
+                        swap_usdt_value = round(swap_sol_value * sol_price, 3)
+                        swap_info["usdValue"] = swap_usdt_value
+
                         create_trading_history(
                             mint=token["mint"],
                             symbol=token["symbol"], 
@@ -89,6 +92,7 @@ async def main():
                             sell_price=token_actual_price
                         )
 
+                    # Send telegram message
                     hunter.send_swap_message(swap_info)
 
     save_wallet_cache(wallet_cache)

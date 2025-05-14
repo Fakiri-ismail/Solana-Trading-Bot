@@ -46,15 +46,23 @@ class HunterBot:
     def send_swap_message(self, swap_info):
         msg = "✅ Transaction finalized !\n" if swap_info['status'] else "❌ Transaction failed !\n"
         if not swap_info['swapData']:
-            msg += f"❌ <b>{swap_info['symbol']}</b> SWAP failed !\n"
+            msg += f"❌ SWAP failed !\n"
+            msg += f"💎 Symbol : <b>{swap_info['symbol']}</b>\n"
         else:
-            msg += f"✅ <b>{swap_info['symbol']}</b> SWAP success !\n"
+            msg += f"✅ SWAP success !\n"
+            msg += f"💎 Symbol : <b>{swap_info['symbol']}</b>\n"
+
             token_output = swap_info['swapData']['tokenOutput']
-            amount = int(token_output['amount']) / 10 ** int(token_output['decimals'])
-            msg += f"💰 Amount: {amount} USDC\n"
+            out_amount = token_output['amount'] / 10 ** token_output['decimals']
+            msg += f"💰 Amount : {out_amount} SOL\n"
+            msg += f"💵 Value : <b>{swap_info['usdValue']}$</b>\n"
+
+            mint = swap_info['swapData']['tokenInput']['mint']
+            dex_url = f"https://dexscreener.com/solana/{mint}"
+            msg += f"🔗 <a href='{dex_url}'>DEX</a>\n"
         
         solscan_url = f"https://solscan.io/tx/{swap_info['transactionId']}"
-        msg += f"🔗 <a href='{solscan_url}'>SolScan</a>"
+        msg += f"🔀 <a href='{solscan_url}'>SolScan</a>"
         return self.send_message(msg)
 
 
@@ -66,9 +74,10 @@ if __name__ == "__main__":
     tx_failed = "R6quTum5ruRqtbztZ3mcitRuS2abDGFBDKyX9k6Mi2t4riKCyVX78iYWSJ7B1UgTKUY4U14oAJKbdEt3iD19eSe"
     swap_info ={
         "status": True,
-        "transactionId": tx_failed,
+        "transactionId": tx_passed,
         "symbol": "ALCH",
-        "swapData": get_swap_data(tx_failed)
+        "swapData": get_swap_data(tx_passed),
+        "usdValue": 12.134
     }
     response = bot.send_swap_message(swap_info)
     print(response)
