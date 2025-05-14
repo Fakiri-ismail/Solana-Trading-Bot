@@ -6,8 +6,7 @@ from solana.rpc.api import Client
 
 from exchanges.jupiter.swap import get_quote, build_transaction, send_transaction
 from wallet.helpers import get_signature_status
-from global_config import HELIUS_RPC, SOL_URI
-from global_config import USDC, WSOL
+from global_config import HELIUS_RPC, SOL_URI, WSOL
 
 
 class WalletManager():
@@ -80,30 +79,21 @@ class WalletManager():
             if mint_or_symbol in [token["mint"], token["symbol"]]:
                 return token
 
-    async def buy_token(self, mint: str, usd_amount: float, slippage: int = 500):
-        """
-        Buy a token using the Jupiter API
-        - mint: The mint address of the token to buy
-        - usd_amount: The USD amount of the token to buy
-        - param slippage: The slippage percentage (default is 5%)
-        :return: The transaction ID
-        """
-        pass
-
-    async def sell_token(self, mint: str, pct_amount: float, slippage: int = 500):
+    async def swap_token(self, in_mint, out_mint=WSOL, pct_amount=50, slippage=500):
         """
         Sell a token using the Jupiter API
-        - mint: The mint address of the token to sell
-        - pct_amount: The percentage of the token to sell (0-100)
-        - param slippage: The slippage percentage (default is 5%)
+        - in_mint (str): The mint address of the token to sell
+        - out_mint (str): The mint address of the token to buy (default is WSOL)
+        - pct_amount (int): The percentage of the token to sell (0-100 : default is 50%)
+        - param slippage (int): The slippage percentage (default is 5%)
         :return: The transaction ID
         """
         # Get the token info and calculate the amount to sell
-        token = self.get_token(mint)
+        token = self.get_token(in_mint)
         amount = int(token["balance"] * (pct_amount / 100))
 
         # Swap
-        quote = get_quote(mint, USDC, amount, slippage)
+        quote = get_quote(in_mint, out_mint, amount, slippage)
         swap_transaction = build_transaction(self.public_key, quote)
         tx_id = await send_transaction(self.payer, swap_transaction)
         count, tx_status = 0, False
