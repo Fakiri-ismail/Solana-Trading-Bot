@@ -10,6 +10,9 @@ from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL, USDC
 
 
 hunter = HunterBot()
+sol_price = getJupPrice(WSOL).get(WSOL, {}).get("price", 0)
+if not sol_price:
+        raise Exception(f"Price not found for {WSOL}")
 
 async def main():
     # Load the wallet cache
@@ -64,7 +67,7 @@ async def main():
                 threshold_lower = 0.5 * float(cache_token["purchase_price"])
 
                 if token_actual_price >= threshold_upper or token_actual_price <= threshold_lower:
-                    result = await my_wallet.sell_token(mint=token["mint"], pct_amount=100)
+                    result = await my_wallet.swap_token(in_mint=token["mint"], out_mint=WSOL, pct_amount=100)
                     swap_info ={
                         "status": result.get("status"),
                         "transactionId": result.get("tx_signature"),
@@ -76,7 +79,8 @@ async def main():
                         swap_data = get_swap_data(result.get("tx_signature"))
                         # Send telegram message
                         swap_info["swapData"] = swap_data
-                        swap_usdt_value = int(swap_data['tokenOutput']['amount']) / 10 ** int(swap_data['tokenOutput']['decimals'])
+                        swap_sol_value = swap_data['tokenOutput']['amount'] / 10 ** swap_data['tokenOutput']['decimals']
+                        swap_usdt_value = swap_sol_value * sol_price
                         create_trading_history(
                             mint=token["mint"],
                             symbol=token["symbol"], 
