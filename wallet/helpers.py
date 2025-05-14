@@ -3,7 +3,7 @@ from typing import List
 from solders.pubkey import Pubkey
 from solders.signature import Signature
 from solana.rpc.api import Client
-from global_config import SOL_URI, HELIUS_API, HELIUS_API_KEY, WSOL
+from global_config import SOL_URI, HELIUS_API, HELIUS_API_KEY, WSOL, USDC
 
 
 sol_client = Client(SOL_URI)
@@ -116,15 +116,19 @@ def get_swap_data(tx_signature: str) -> dict:
         # Extract the transfer data
         transfer_data = transaction_data.get("tokenTransfers")
         if len(transfer_data) >= 2:
+            if transfer_data[0].get("mint") in [WSOL, USDC]:
+                transfer_data_input, transfer_data_output = transfer_data[1], transfer_data[0]
+            else:
+                transfer_data_input, transfer_data_output = transfer_data[0], transfer_data[1]
             token_input = {
-            "mint": transfer_data[0].get("mint"),
-            "amount": float(transfer_data[0].get("tokenAmount")),
-            "decimals": 0
+                "mint": transfer_data_input.get("mint"),
+                "amount": float(transfer_data_input.get("tokenAmount")),
+                "decimals": 0
             }
             token_output = {
-            "mint": transfer_data[1].get("mint"),
-            "amount": float(transfer_data[1].get("tokenAmount")),
-            "decimals": 0
+                "mint": transfer_data_output.get("mint"),
+                "amount": float(transfer_data_output.get("tokenAmount")),
+                "decimals": 0
             }
     else:
         # Extract the swap data
