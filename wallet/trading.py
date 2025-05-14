@@ -10,9 +10,9 @@ from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL, USDC
 
 
 hunter = HunterBot()
-sol_price = getJupPrice(WSOL).get(WSOL, {}).get("price", 0)
+sol_price = float(getJupPrice(WSOL).get(WSOL, {}).get("price", 0))
 if not sol_price:
-        raise Exception(f"Price not found for {WSOL}")
+    raise Exception(f"Price not found for {WSOL}")
 
 async def main():
     # Load the wallet cache
@@ -78,19 +78,24 @@ async def main():
                     if result.get("status"):
                         # Get the swap data
                         swap_data = get_swap_data(result.get("tx_signature"))
-                        swap_info["swapData"] = swap_data
-                        
-                        swap_sol_value = swap_data['tokenOutput']['amount'] / 10 ** swap_data['tokenOutput']['decimals']
-                        swap_usdt_value = round(swap_sol_value * sol_price, 3)
-                        swap_info["usdValue"] = swap_usdt_value
+                        swap_usdt_value = token_usd_value
+                        if swap_data:
+                            swap_info["swapData"] = swap_data
+                            try:
+                                swap_sol_value = swap_data['tokenOutput']['amount'] / 10 ** swap_data['tokenOutput']['decimals']
+                                swap_usdt_value = round(swap_sol_value * sol_price, 3)
+                                swap_info["usdValue"] = swap_usdt_value
+                            except Exception as e:
+                                print(f"Error calculating swap value:\n {e}")
+                                swap_info["usdValue"] = token_usd_value
 
-                        create_trading_history(
-                            mint=token["mint"],
-                            symbol=token["symbol"], 
-                            usdt_value=swap_usdt_value,
-                            buy_price=float(cache_token["purchase_price"]),
-                            sell_price=token_actual_price
-                        )
+                            create_trading_history(
+                                mint=token["mint"],
+                                symbol=token["symbol"], 
+                                usdt_value=swap_usdt_value,
+                                buy_price=float(cache_token["purchase_price"]),
+                                sell_price=token_actual_price
+                            )
 
                     # Send telegram message
                     hunter.send_swap_message(swap_info)
