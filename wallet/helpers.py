@@ -100,12 +100,14 @@ def get_swap_data(tx_signature: str) -> dict:
     transaction_data = get_transaction_data([tx_signature])
     # Check if the transaction data is empty
     if not transaction_data:
+        print(f"Swap data not found for : {tx_signature}")
         return None
     transaction_data = transaction_data[0]
 
     # Check if the transaction has an error 
     transaction_error = transaction_data.get("transactionError")
     if transaction_error:
+        print(f"Transaction error detected for : {tx_signature}")
         return None
     
     # Check if the transaction is a swap transaction
@@ -113,7 +115,7 @@ def get_swap_data(tx_signature: str) -> dict:
     if not swap_data:
         # Extract the transfer data
         transfer_data = transaction_data.get("tokenTransfers")
-        if len(transfer_data) == 2:
+        if len(transfer_data) >= 2:
             token_input = {
             "mint": transfer_data[0].get("mint"),
             "amount": float(transfer_data[0].get("tokenAmount")),
@@ -133,13 +135,23 @@ def get_swap_data(tx_signature: str) -> dict:
                 "amount": int(swap_data.get("nativeInput", {}).get("amount", 0)),
                 "decimals": 9
             }
-        else:
-            token_input_data = swap_data.get("tokenInputs")[0] if swap_data.get("tokenInputs") else {}
+        elif swap_data.get("tokenInputs"):
+            token_input_data = swap_data.get("tokenInputs")[0]
             token_input = {
                 "mint": token_input_data.get("mint"),
                 "amount": int(token_input_data.get("rawTokenAmount", {}).get("tokenAmount", 0)),
                 "decimals": token_input_data.get("rawTokenAmount", {}).get("decimals")
             }
+        elif swap_data.get("innerSwaps"):
+            token_input_data = swap_data.get("innerSwaps")[0]["tokenInputs"][0]
+            token_input = {
+                "mint": token_input_data.get("mint"),
+                "amount": float(token_input_data.get("tokenAmount")),
+                "decimals": 0
+            }
+        else:
+            print(f"Token input data not found for : {tx_signature}")
+            token_input = None
         
         ## Extract the token output data
         if swap_data.get("nativeOutput"):
@@ -148,13 +160,16 @@ def get_swap_data(tx_signature: str) -> dict:
                 "amount": int(swap_data.get("nativeOutput", {}).get("amount", 0)),
                 "decimals": 9
             }
-        else:
-            token_output_data = swap_data.get("tokenOutputs")[0] if swap_data.get("tokenOutputs") else {}
+        elif swap_data.get("tokenOutputs"):
+            token_output_data = swap_data.get("tokenOutputs")[0]
             token_output = {
                 "mint": token_output_data.get("mint"),
                 "amount": int(token_output_data.get("rawTokenAmount", {}).get("tokenAmount", 0)),
                 "decimals": token_output_data.get("rawTokenAmount", {}).get("decimals")
             }
+        else:
+            print(f"Token output data not found for : {tx_signature}")
+            token_output = None
 
     return {
         "description": transaction_data.get("description"),
@@ -169,5 +184,5 @@ if __name__ == "__main__":
     tx_passed = "2KUQ3ZdUYa5FthTFT3YzNFCnsGzj7XbtxrWfnGSfj7hHSt8PN96gEba3Kc7W2p6LU38e3TW8amaGPFpjPcWqNQtU"
     tx_failed = "R6quTum5ruRqtbztZ3mcitRuS2abDGFBDKyX9k6Mi2t4riKCyVX78iYWSJ7B1UgTKUY4U14oAJKbdEt3iD19eSe"
     tx_not_exist = "5pNsKQCV6vfdcZjWeY8nTJDoVkXq7RiyHAHuNpAPDeDuHwLNZEvdBhLmpuM8aocYaL8Cx5jhUmSTGddPjTFg1ZkP"
-    print(get_swap_data(tx_not_exist))
+    print(get_swap_data(tx_passed))
     
