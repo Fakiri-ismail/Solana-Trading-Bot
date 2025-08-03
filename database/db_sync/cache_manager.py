@@ -1,36 +1,39 @@
 import os, json
 from datetime import datetime
+from helpers import json_helpers
 from database.crud.wallet.wallet_tokens_ops import get_all_wallet_tokens
 from database.crud.wallet.wallet_tokens_ops import insert_wallet_token, delete_wallet_token
 
 
-LOCAL_CACHE_FILE = "database/db_sync/wallet_cache.json"
-LAST_UPDATE_FILE = "database/db_sync/last_update.txt"
+WALLET_CACHE_FILE = "database/db_sync/wallet_cache.json"
+TOP_TRADING_CACHE_FILE = "database/db_sync/top_trading_cache.json"
+LAST_UPDATE_FILE = "database/db_sync/last_update.json"
 
 
 def load_wallet_cache():
-    if os.path.exists(LOCAL_CACHE_FILE):
-        with open(LOCAL_CACHE_FILE, "r") as f:
-            content = f.read()
-            if not content.strip():
-                return []
-            return json.loads(content)
-    return []
+    return json_helpers.read_json_file(WALLET_CACHE_FILE)
     
 def save_wallet_cache(wallet_cache):
-    with open(LOCAL_CACHE_FILE, "w") as f:
-        json.dump(wallet_cache, f, indent=4)
+    json_helpers.write_json_file(wallet_cache)
 
 
-def update_last_sync_time():
-    with open(LAST_UPDATE_FILE, "w") as f:
-        f.write(datetime.now().isoformat())
+def update_last_sync_time(field):
+    try:
+        with open(LAST_UPDATE_FILE, 'r') as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        data = {}
 
-def get_last_sync_time():
+    data[field] = datetime.now().isoformat()
+
+    with open(LAST_UPDATE_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+
+def get_last_sync_time(field):
     if os.path.exists(LAST_UPDATE_FILE):
-        with open(LAST_UPDATE_FILE, "r") as f:
-            return datetime.fromisoformat(f.read().strip())
-    return None
+        with open(LAST_UPDATE_FILE, 'r') as f:
+            data = json.load(f)
+        return data.get(field, None)
 
 
 def should_sync_db(interval=60):
@@ -39,7 +42,7 @@ def should_sync_db(interval=60):
     :param interval: The interval in minutes to check for syncing.
     :return: True if the database should be synced, False otherwise.
     """
-    last_sync = get_last_sync_time()
+    last_sync = get_last_sync_time('wallet')
     if not last_sync:
         return True
     else:
@@ -77,5 +80,5 @@ def sync_with_db():
                 )
     
         # Update the last sync time
-        update_last_sync_time()
+        update_last_sync_time('wallet')
         return True
