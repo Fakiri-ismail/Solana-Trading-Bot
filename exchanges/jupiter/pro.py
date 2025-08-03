@@ -37,5 +37,11 @@ def get_toptrending(timeframe: str='24h', params: dict = {}) -> dict:
 
 if __name__ == "__main__":
     # Example usage
-    toptrading = get_toptrending(timeframe='24h', params={'limit': 1, 'sortBy': 'volume', 'sortDir': 'desc'})
+    params = {
+        'limit': 2,
+        'minNumNetBuyers1h': 200,
+        'minMcap': 800_000,
+        'maxMcap': 500_000_000
+    }
+    toptrading = get_toptrending(timeframe='1h', params=params)
     print(toptrading)
