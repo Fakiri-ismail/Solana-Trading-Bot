@@ -3,5 +3,8 @@ SOL_PROJECT_PATH=/path/to/solana-trading-bot
 # Run every day at 4pm
 0 16 * * * $SOL_PROJECT_PATH/scripts/wallet_history.sh >> $SOL_PROJECT_PATH/test.log 2>&1
 
-# Runs every 2 min
+# Run every 2 min
 */2 * * * * $SOL_PROJECT_PATH/scripts/trading.sh >> $SOL_PROJECT_PATH/test.log 2>&1
+
+# Run every 15 min at :10, :25, :40 and :55
+10,25,40,55 * * * * $SOL_PROJECT_PATH/scripts/top_trading_pools.sh >> $SOL_PROJECT_PATH/test.log 2>&1
