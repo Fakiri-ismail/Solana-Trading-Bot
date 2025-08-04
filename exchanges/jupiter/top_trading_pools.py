@@ -1,12 +1,17 @@
+from datetime import datetime
 from exchanges.jupiter import pro
+from database.db_sync import cache_manager
 from telegram.hunter_bot import HunterBot
+from helpers.json_helpers import delete_file
+
 
 if __name__ == "__main__":
 
-    # hunter = HunterBot()
-    top_pools_cache = []
+    # Load top trading poools data
+    top_pools_cache = cache_manager.load_top_trading_pools_cache()
     mints_cache = [pool['mint'] for pool in top_pools_cache]
     
+    # Get new top trading poools
     params = {
         'minNetVolume1h': 100,
         'minNumNetBuyers1h': 0,
@@ -15,6 +20,7 @@ if __name__ == "__main__":
     }
     pools = pro.get_toptrending(timeframe='1h', params=params).get('pools', {})
 
+    # Filter and Update Data
     top_trading_pools = []
     for pool in pools:
         token_info = pool.get('baseAsset', {})
@@ -23,8 +29,8 @@ if __name__ == "__main__":
             if mint in mints_cache:
                 result = next((token for token in top_pools_cache if token["mint"] == mint), None)
                 # Update Token data
-                result['holderCount'] = token_info.get('holderCount'),
-                result['mcap'] = token_info.get('mcap'),
+                result['holderCount'] = token_info.get('holderCount')
+                result['mcap'] = token_info.get('mcap')
                 result['appearance'] +=1
                 top_trading_pools.append(result)
             else:
@@ -39,5 +45,20 @@ if __name__ == "__main__":
                         'appearance': 1
                     }
                 )
+    # Save top trading poools data
+    cache_manager.save_top_trading_pools_cache(top_trading_pools)
 
-    print(top_trading_pools)
+    # Send a Telegram message every 4 hours
+    last_send_time = cache_manager.get_last_sync_time('top_trading_telegram')
+    if last_send_time:
+        now = datetime.now()
+        delta = (now - last_send_time).total_seconds() > 3600 * 4
+        if delta:
+            hunter = HunterBot()
+            hunter.send_top_trading_pools_message(top_trading_pools)
+            cache_manager.update_last_sync_time('top_trading_telegram')
+    else:
+        cache_manager.update_last_sync_time('top_trading_telegram')
+
+    # Synchronize the database and clear the cache every day
+    cache_manager.sync_top_trading_pools_with_db()
