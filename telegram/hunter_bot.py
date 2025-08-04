@@ -78,7 +78,7 @@ class HunterBot:
 
 if __name__ == "__main__":
     # Example usage
-    from wallet.helpers import get_swap_data
+    from wallet.wallet_helpers import get_swap_data
     bot = HunterBot()
     tx_passed = "5pNsKQCV6vfdcZjWeY8nTJDoVkXq7RiyHAHuNpAPDeDuHwLNZEvdBhLTpuM8aocYaL8Cx5jhUmSTGddPjTFg1ZkP"
     tx_failed = "R6quTum5ruRqtbztZ3mcitRuS2abDGFBDKyX9k6Mi2t4riKCyVX78iYWSJ7B1UgTKUY4U14oAJKbdEt3iD19eSe"

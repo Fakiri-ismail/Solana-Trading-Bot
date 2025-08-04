@@ -1,7 +1,7 @@
 import asyncio
 from telegram.hunter_bot import HunterBot
 from wallet.manager import WalletManager
-from wallet.helpers import get_swap_data
+from wallet.wallet_helpers import get_swap_data
 from database.db_sync import cache_manager
 from database.crud.wallet.wallet_tokens_ops import get_all_wallet_tokens
 from database.crud.wallet.trading_history_ops import create_trading_history
