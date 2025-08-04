@@ -25,3 +25,11 @@ def add_json_record(file_path: str, record) -> None:
         data.append(record)
 
     write_json_file(file_path, data)
+
+
+def delete_file(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print("File deleted.")
+    else:
+        print("File not found.")
