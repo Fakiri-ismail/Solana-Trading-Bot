@@ -9,13 +9,29 @@ WALLET_CACHE_FILE = "database/db_sync/wallet_cache.json"
 TOP_TRADING_CACHE_FILE = "database/db_sync/top_trading_cache.json"
 LAST_UPDATE_FILE = "database/db_sync/last_update.json"
 
-
+# Wallet chache
 def load_wallet_cache():
     return json_helpers.read_json_file(WALLET_CACHE_FILE)
     
-def save_wallet_cache(wallet_cache):
-    json_helpers.write_json_file(wallet_cache)
+def save_wallet_cache(wallet_data):
+    json_helpers.write_json_file(WALLET_CACHE_FILE, wallet_data)
 
+# Top Trading pools cache
+def load_top_trading_pools_cache():
+    return json_helpers.read_json_file(TOP_TRADING_CACHE_FILE)
+
+def save_top_trading_pools_cache(top_trading_data):
+    json_helpers.write_json_file(TOP_TRADING_CACHE_FILE, top_trading_data)
+
+# Sync Time
+def get_last_sync_time(field):
+    if os.path.exists(LAST_UPDATE_FILE):
+        with open(LAST_UPDATE_FILE, 'r') as f:
+            data = json.load(f)
+        
+        last_sync = data.get(field, None)
+        if last_sync:
+            return datetime.fromisoformat(last_sync)
 
 def update_last_sync_time(field):
     try:
@@ -25,60 +41,57 @@ def update_last_sync_time(field):
         data = {}
 
     data[field] = datetime.now().isoformat()
-
     with open(LAST_UPDATE_FILE, 'w') as f:
         json.dump(data, f, indent=4)
 
-def get_last_sync_time(field):
-    if os.path.exists(LAST_UPDATE_FILE):
-        with open(LAST_UPDATE_FILE, 'r') as f:
-            data = json.load(f)
-        return data.get(field, None)
-
-
-def should_sync_db(interval=60):
+# Sync Database    
+def sync_wallet_with_db():
     """
-    Check if the database should be synced based on the last sync time and the current time.
-    :param interval: The interval in minutes to check for syncing.
-    :return: True if the database should be synced, False otherwise.
+    Sync the database with the local wallet cache.
     """
-    last_sync = get_last_sync_time('wallet')
-    if not last_sync:
-        return True
+    wallet_last_sync = get_last_sync_time('wallet')
+    if wallet_last_sync:
+        if (datetime.now() - wallet_last_sync).total_seconds() > 3600:
+            # Load the wallet cache
+            wallet_cache = load_wallet_cache()
+            cache_mints = [t["mint"] for t in wallet_cache]
+            # Load the wallet datebase
+            wallet_db = get_all_wallet_tokens()
+            db_mints = [token.mint for token in wallet_db]
+
+            # Remove tokens that are not in the wallet anymore
+            for db_mint in db_mints:
+                if db_mint not in cache_mints:
+                    # Delete token from DB
+                    delete_wallet_token(mint=db_mint)
+
+            # Insert new token into DB
+            for token in wallet_cache:
+                if token["mint"] not in db_mints:
+                    # Insert new token into DB
+                    insert_wallet_token(
+                        mint=token["mint"],
+                        symbol=token["symbol"],
+                        purchase_price=token["purchase_price"],
+                        usdt_value=token["usdt_value"])
+            
+            # Update the last sync time
+            update_last_sync_time('wallet')
     else:
-        now = datetime.now()
-        return (now - last_sync).total_seconds() > interval * 60
-
-def sync_with_db():
-    """
-    Sync the database with the local cache.
-    :return: True if the sync was successful, False otherwise.
-    """
-    if should_sync_db():
-        # Load the wallet cache
-        wallet_cache = load_wallet_cache()
-        cache_mints = [t["mint"] for t in wallet_cache]
-        # Load the wallet datebase
-        wallet_db = get_all_wallet_tokens()
-        db_mints = [token.mint for token in wallet_db]
-
-        # Remove tokens that are not in the wallet anymore
-        for db_mint in db_mints:
-            if db_mint not in cache_mints:
-                # Delete token from DB
-                delete_wallet_token(mint=db_mint)
-
-        # Insert new token into DB
-        for token in wallet_cache:
-            if token["mint"] not in db_mints:
-                # Insert new token into DB
-                insert_wallet_token(
-                    mint=token["mint"],
-                    symbol=token["symbol"],
-                    purchase_price=token["purchase_price"],
-                    usdt_value=token["usdt_value"]
-                )
-    
-        # Update the last sync time
         update_last_sync_time('wallet')
-        return True
+
+def sync_top_trading_pools_with_db():
+    """
+    Sync the database with the local top tradin pools cache.
+    """
+    top_trading_last_sync = get_last_sync_time('top_trading_db')
+    if top_trading_last_sync:
+        if (datetime.now() - top_trading_last_sync).days > 0:
+            # Sync Top trading pools cache with Database
+
+            # Clear the cache
+            json_helpers.delete_file(TOP_TRADING_CACHE_FILE)
+            # Update the last sync time
+            update_last_sync_time('top_trading_db')
+    else:
+        update_last_sync_time('top_trading_db')
