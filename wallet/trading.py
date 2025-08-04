@@ -1,22 +1,21 @@
 import asyncio
+from telegram.hunter_bot import HunterBot
 from wallet.manager import WalletManager
 from wallet.helpers import get_swap_data
-from exchanges.jupiter.price import getJupPrice
+from database.db_sync import cache_manager
 from database.crud.wallet.wallet_tokens_ops import get_all_wallet_tokens
 from database.crud.wallet.trading_history_ops import create_trading_history
-from database.db_sync.cache_manager import load_wallet_cache, save_wallet_cache, sync_with_db
-from telegram.hunter_bot import HunterBot
+from exchanges.jupiter.price import getJupPrice
 from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL, USDC
 
 
-hunter = HunterBot()
 sol_price = float(getJupPrice(WSOL).get(WSOL, {}).get("price", 0))
 if not sol_price:
     raise Exception(f"Price not found for {WSOL}")
 
 async def main():
     # Load the wallet cache
-    wallet_cache = load_wallet_cache()
+    wallet_cache = cache_manager.load_wallet_cache()
     if not wallet_cache:
         db_wallet_tokens = get_all_wallet_tokens()
         for token in db_wallet_tokens:
@@ -98,12 +97,14 @@ async def main():
                             )
 
                     # Send telegram message
+                    hunter = HunterBot()
                     hunter.send_swap_message(swap_info)
 
-    save_wallet_cache(wallet_cache)
+    # Save wallet cache
+    cache_manager.save_wallet_cache(wallet_cache)
 
     # Update the database
-    sync_with_db()
+    cache_manager.sync_wallet_with_db()
 
 
 asyncio.run(main())
