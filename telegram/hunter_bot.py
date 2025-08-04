@@ -59,10 +59,20 @@ class HunterBot:
 
             mint = swap_info['swapData']['tokenInput']['mint']
             dex_url = f"https://dexscreener.com/solana/{mint}"
-            msg += f"🔗 <a href='{dex_url}'>DEX</a>\n"
+            jup_url = f"https://jup.ag/tokens/{mint}"
+            msg += f"🔗 <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>\n"
         
         solscan_url = f"https://solscan.io/tx/{swap_info['transactionId']}"
         msg += f"🔀 <a href='{solscan_url}'>SolScan</a>"
+        return self.send_message(msg)
+    
+    def send_top_trading_pools_message(self, top_trading_data):
+        sorted_data = sorted(top_trading_data, key=lambda d: d["appearance"], reverse=True)
+        msg = "🔥​ TOP TRADING TOKENS:\n"
+        for token in sorted_data[:10]:
+            jup_url = f"https://jup.ag/tokens/{token['mint']}"
+            msg += f"💎 <b>{token['symbol']}</b> : {token['appearance']} times ➡️ <a href='{jup_url}'>JUP</a>\n"
+
         return self.send_message(msg)
 
 
