@@ -21,7 +21,7 @@ if __name__ == "__main__":
     pools = pro.get_toptrending(timeframe='1h', params=params).get('pools', {})
 
     # Filter and Update Data
-    top_trading_pools = []
+    #top_trading_pools = []
     for pool in pools:
         token_info = pool.get('baseAsset', {})
         mint = token_info.get('id')
@@ -32,10 +32,10 @@ if __name__ == "__main__":
                 result['holderCount'] = token_info.get('holderCount')
                 result['mcap'] = token_info.get('mcap')
                 result['appearance'] +=1
-                top_trading_pools.append(result)
+                #top_trading_pools.append(result)
             else:
                 # Add New Token
-                top_trading_pools.append(
+                top_pools_cache.append(
                     {
                         'mint': mint,
                         'symbol': token_info.get('symbol'),
@@ -46,7 +46,7 @@ if __name__ == "__main__":
                     }
                 )
     # Save top trading poools data
-    cache_manager.save_top_trading_pools_cache(top_trading_pools)
+    cache_manager.save_top_trading_pools_cache(top_pools_cache)
 
     # Send a Telegram message every 4 hours
     last_send_time = cache_manager.get_last_sync_time('top_trading_telegram')
