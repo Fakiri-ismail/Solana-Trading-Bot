@@ -71,7 +71,7 @@ class HunterBot:
         msg = "🔥​ TOP TRADING TOKENS:\n"
         for token in sorted_data[:10]:
             jup_url = f"https://jup.ag/tokens/{token['mint']}"
-	    dex_url = f"https://dexscreener.com/solana/{token['mint']}"
+            dex_url = f"https://dexscreener.com/solana/{token['mint']}"
             msg += f"💎 <b>{token['symbol']}</b> : {token['appearance']} times\n"
             msg += f"🔗  <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>\n"
 
