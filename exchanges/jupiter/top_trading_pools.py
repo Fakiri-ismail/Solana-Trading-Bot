@@ -55,7 +55,7 @@ if __name__ == "__main__":
         delta = (now - last_send_time).total_seconds() > 3600 * 4
         if delta:
             hunter = HunterBot()
-            hunter.send_top_trading_pools_message(top_trading_pools)
+            hunter.send_top_trading_pools_message(top_pools_cache)
             cache_manager.update_last_sync_time('top_trading_telegram')
     else:
         cache_manager.update_last_sync_time('top_trading_telegram')
