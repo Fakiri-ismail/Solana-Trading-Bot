@@ -24,15 +24,15 @@ class HunterBot:
         response = requests.post(url, json=payload)
         return response.json()
     
-    def send_photo(self, photo_path):
+    def send_photo(self, photo_path, caption=""):
         url = f"{self.api_url}/sendPhoto"
         with open(photo_path, 'rb') as photo:
             payload = {
                 "chat_id": self.chat_id,
+                "caption": caption,
+                "parse_mode": "HTML"
             }
-            files = {
-                'photo': photo
-            }
+            files = {'photo': photo}
             response = requests.post(url, data=payload, files=files)
         return response.json()
     
