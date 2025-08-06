@@ -1,4 +1,5 @@
 from wallet.manager import WalletManager
+from wallet import report
 from database.crud.wallet.wallet_history_ops import create_wallet_history
 from exchanges.jupiter.price import getJupPrice
 from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL
@@ -28,3 +29,6 @@ if __name__ == "__main__":
         balance_usdt=round(wallet_usd_value,3),
         balance_sol=round(wallet_sol_value,5)
     )
+
+    # Send the wallet report at the end of the month
+    report.send_wallet_history_report()
