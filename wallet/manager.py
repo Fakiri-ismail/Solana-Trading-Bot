@@ -5,7 +5,7 @@ from solders.pubkey import Pubkey
 from solana.rpc.api import Client
 
 from exchanges.jupiter.swap import get_quote, build_transaction, send_transaction
-from wallet.wallet_helpers import get_signature_status
+from helpers.wallet_helpers import get_signature_status
 from global_config import HELIUS_RPC, SOL_URI, WSOL
 
 
