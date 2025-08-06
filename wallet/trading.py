@@ -80,6 +80,8 @@ async def main():
                         swap_usdt_value = token_usd_value
                         if swap_data:
                             swap_info["swapData"] = swap_data
+                            swap_info["buy_price"] = float(cache_token["purchase_price"])
+                            swap_info["sell_price"] = token_actual_price
                             try:
                                 swap_sol_value = swap_data['tokenOutput']['amount'] / 10 ** swap_data['tokenOutput']['decimals']
                                 swap_usdt_value = round(swap_sol_value * sol_price, 3)
@@ -92,8 +94,8 @@ async def main():
                                 mint=token["mint"],
                                 symbol=token["symbol"], 
                                 usdt_value=swap_usdt_value,
-                                buy_price=float(cache_token["purchase_price"]),
-                                sell_price=token_actual_price
+                                buy_price=swap_info["buy_price"],
+                                sell_price=swap_info["sell_price"]
                             )
 
                     # Send telegram message

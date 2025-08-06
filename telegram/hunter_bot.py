@@ -54,10 +54,17 @@ class HunterBot:
 
             token_output = swap_info['swapData']['tokenOutput']
             out_amount = token_output['amount'] / 10 ** token_output['decimals']
-            msg += f"💰 Amount : {out_amount} SOL\n"
+            msg += f"💰 Amount : <b>{round(out_amount, 3)} SOL</b>\n"
             msg += f"💵 Value : <b>{swap_info['usdValue']}$</b>\n"
 
+            pnl = round(swap_info['sell_price'] - swap_info['buy_price'], 3)
+            pnl_pct = round((pnl / swap_info['buy_price']) * 100, 2)
+            emoji = "🟢" if pnl > 0 else "🔴"
+            msg += f"{emoji} PNL : <b>{pnl}$</b> (<b>{pnl_pct}%</b>)\n"
+
             mint = swap_info['swapData']['tokenInput']['mint']
+            msg += f"<code>{mint}</code>\n"
+
             dex_url = f"https://dexscreener.com/solana/{mint}"
             jup_url = f"https://jup.ag/tokens/{mint}"
             msg += f"🔗 <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>\n"
@@ -89,7 +96,9 @@ if __name__ == "__main__":
         "transactionId": tx_passed,
         "symbol": "ALCH",
         "swapData": get_swap_data(tx_passed),
-        "usdValue": 12.134
+        "usdValue": 12.134,
+        "buy_price": 10,
+        "sell_price": 15
     }
     response = bot.send_swap_message(swap_info)
     print(response)
