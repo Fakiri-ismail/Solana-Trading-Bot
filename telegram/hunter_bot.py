@@ -1,5 +1,6 @@
 import requests, os
 from dotenv import load_dotenv
+from helpers.utils import format_number
 
 
 load_dotenv()
@@ -77,9 +78,10 @@ class HunterBot:
         sorted_data = sorted(top_trading_data, key=lambda d: d["appearance"], reverse=True)
         msg = "🔥​ TOP TRADING TOKENS:\n"
         for token in sorted_data[:10]:
+            msg += f"💎 <b>{token['symbol']}</b> : {token['appearance']} times\n"
+            msg += f"💰 Market Cap : <b>{format_number(token['mcap'])}$</b>\n"
             jup_url = f"https://jup.ag/tokens/{token['mint']}"
             dex_url = f"https://dexscreener.com/solana/{token['mint']}"
-            msg += f"💎 <b>{token['symbol']}</b> : {token['appearance']} times\n"
             msg += f"🔗  <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>\n"
 
         return self.send_message(msg)
@@ -87,8 +89,10 @@ class HunterBot:
 
 if __name__ == "__main__":
     # Example usage
-    from wallet.wallet_helpers import get_swap_data
+    from helpers.wallet_helpers import get_swap_data
     bot = HunterBot()
+
+    # Example swap info
     tx_passed = "5pNsKQCV6vfdcZjWeY8nTJDoVkXq7RiyHAHuNpAPDeDuHwLNZEvdBhLTpuM8aocYaL8Cx5jhUmSTGddPjTFg1ZkP"
     tx_failed = "R6quTum5ruRqtbztZ3mcitRuS2abDGFBDKyX9k6Mi2t4riKCyVX78iYWSJ7B1UgTKUY4U14oAJKbdEt3iD19eSe"
     swap_info ={
@@ -100,5 +104,14 @@ if __name__ == "__main__":
         "buy_price": 10,
         "sell_price": 15
     }
-    response = bot.send_swap_message(swap_info)
+    # response = bot.send_swap_message(swap_info)
+    # print(response)
+
+    # Example top trading pools message
+    top_trading_data = [
+        {"mint": "Dz9mQ9NzkBcCsuGPFJ3r1bS4wgqKMHBPiVuniW8Mbonk", "symbol": "USELESS", "appearance": 5, "mcap": 207073097.5218624},
+        {"mint": "7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3", "symbol": "SLERF", "appearance": 3, "mcap": 36912585.23428662},
+    ]
+    response = bot.send_top_trading_pools_message(top_trading_data)
     print(response)
+
