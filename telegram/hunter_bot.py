@@ -82,7 +82,7 @@ class HunterBot:
             msg += f"💰 Market Cap : <b>{format_number(token['mcap'])}$</b>\n"
             jup_url = f"https://jup.ag/tokens/{token['mint']}"
             dex_url = f"https://dexscreener.com/solana/{token['mint']}"
-            msg += f"🔗  <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>\n"
+            msg += f"🔗  <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>\n\n"
 
         return self.send_message(msg)
 
@@ -112,6 +112,5 @@ if __name__ == "__main__":
         {"mint": "Dz9mQ9NzkBcCsuGPFJ3r1bS4wgqKMHBPiVuniW8Mbonk", "symbol": "USELESS", "appearance": 5, "mcap": 207073097.5218624},
         {"mint": "7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3", "symbol": "SLERF", "appearance": 3, "mcap": 36912585.23428662},
     ]
-    response = bot.send_top_trading_pools_message(top_trading_data)
-    print(response)
-
+    # response = bot.send_top_trading_pools_message(top_trading_data)
+    # print(response)
