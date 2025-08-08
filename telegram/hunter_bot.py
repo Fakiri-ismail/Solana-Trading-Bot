@@ -58,8 +58,9 @@ class HunterBot:
             msg += f"💰 Amount : <b>{round(out_amount, 3)} SOL</b>\n"
             msg += f"💵 Value : <b>{swap_info['usdValue']}$</b>\n"
 
-            pnl = round(swap_info['sell_price'] - swap_info['buy_price'], 3)
-            pnl_pct = round((pnl / swap_info['buy_price']) * 100, 2)
+            pnl_pct = round(((swap_info['sell_price'] - swap_info['buy_price']) / swap_info['buy_price']) * 100, 2)
+            inv_value = round(swap_info['usdValue'] / (1 + (pnl_pct / 100)), 3)
+            pnl = round(swap_info['usdValue'] - inv_value, 3)
             emoji = "🟢" if pnl > 0 else "🔴"
             msg += f"{emoji} PNL : <b>{pnl}$</b> (<b>{pnl_pct}%</b>)\n"
 
