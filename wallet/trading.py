@@ -1,7 +1,8 @@
-import asyncio
+import asyncio, logging, sys
 from telegram.hunter_bot import HunterBot
 from wallet.manager import WalletManager
 from helpers.wallet_helpers import get_swap_data
+from helpers.utils import setup_logging
 from database.db_sync import cache_manager
 from database.crud.wallet.wallet_tokens_ops import get_all_wallet_tokens
 from database.crud.wallet.trading_history_ops import create_trading_history
@@ -9,9 +10,13 @@ from exchanges.jupiter.price import getJupPrice
 from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL, USDC
 
 
-sol_price = float(getJupPrice(WSOL).get(WSOL, {}).get("price", 0))
+# Init logging
+setup_logging('logs/trading.log')
+
+sol_price = getJupPrice(WSOL)
 if not sol_price:
-    raise Exception(f"Price not found for {WSOL}")
+    logging.error("JUP API : Solana price not found")
+    sys.exit(1)
 
 async def main():
     # Load the wallet cache
@@ -39,15 +44,15 @@ async def main():
 
     cache_mints = [t["mint"] for t in wallet_cache]
     for token in wallet_assets:
-        mint_price = getJupPrice(token["mint"]).get(token["mint"], {}).get("price", 0)
-        if not mint_price:
-            print(f"Price not found for {token['symbol']}")
+        token_actual_price = getJupPrice(token["mint"])
+        if not token_actual_price:
+            logging.warning(f"JUP API : '{token['symbol']}' price not found ({token["mint"]})")
             continue
-        token_actual_price = float(mint_price)
         token_usd_value = token_actual_price * (token.get("balance", 0) / 10 ** token.get("decimals", 0))
-        # Check if token already exists in cache
+
+        # New tokens 
         if token["mint"] not in cache_mints:
-            # Add new tokens to the cache
+            # Add token to the cache
             wallet_cache.append({
                 "mint": token["mint"],
                 "symbol": token["symbol"],
@@ -56,12 +61,14 @@ async def main():
             })
 
         # Old tokens  
-        else:
-            if token["mint"] in [WSOL, USDC]:
-                continue
-            
+        else:            
             cache_token = next((t for t in wallet_cache if t["mint"] == token["mint"]), None)
             if cache_token:
+                if token["mint"] in [WSOL, USDC]:
+                    # Update USDC/WSOL value
+                    cache_token['usdt_value'] = token_usd_value
+                    continue
+
                 threshold_upper = 1.8 * float(cache_token["purchase_price"])
                 threshold_lower = 0.5 * float(cache_token["purchase_price"])
 
@@ -77,23 +84,21 @@ async def main():
                     if result.get("status"):
                         # Get the swap data
                         swap_data = get_swap_data(result.get("tx_signature"))
-                        swap_usdt_value = token_usd_value
                         if swap_data:
                             swap_info["swapData"] = swap_data
                             swap_info["buy_price"] = float(cache_token["purchase_price"])
                             swap_info["sell_price"] = token_actual_price
                             try:
                                 swap_sol_value = swap_data['tokenOutput']['amount'] / 10 ** swap_data['tokenOutput']['decimals']
-                                swap_usdt_value = round(swap_sol_value * sol_price, 3)
-                                swap_info["usdValue"] = swap_usdt_value
+                                swap_info["usdValue"] = round(swap_sol_value * sol_price, 3)
                             except Exception as e:
-                                print(f"Error calculating swap value:\n {e}")
+                                logging.error(f"Error calculating swap value:\n {e}")
                                 swap_info["usdValue"] = token_usd_value
 
                             create_trading_history(
                                 mint=token["mint"],
                                 symbol=token["symbol"], 
-                                usdt_value=swap_usdt_value,
+                                usdt_value=swap_info["usdValue"],
                                 buy_price=swap_info["buy_price"],
                                 sell_price=swap_info["sell_price"]
                             )
