@@ -1,8 +1,7 @@
 import os, json
 from datetime import datetime
 from helpers import json_helpers
-from database.crud.wallet.wallet_tokens_ops import get_all_wallet_tokens
-from database.crud.wallet.wallet_tokens_ops import insert_wallet_token, delete_wallet_token
+from database.crud.wallet import wallet_tokens_ops
 
 
 WALLET_CACHE_FILE = "database/db_sync/wallet_cache.json"
@@ -54,26 +53,17 @@ def sync_wallet_with_db():
         if (datetime.now() - wallet_last_sync).total_seconds() > 3600:
             # Load the wallet cache
             wallet_cache = load_wallet_cache()
-            cache_mints = [t["mint"] for t in wallet_cache]
-            # Load the wallet datebase
-            wallet_db = get_all_wallet_tokens()
-            db_mints = [token.mint for token in wallet_db]
 
-            # Remove tokens that are not in the wallet anymore
-            for db_mint in db_mints:
-                if db_mint not in cache_mints:
-                    # Delete token from DB
-                    delete_wallet_token(mint=db_mint)
+            # Clear wallet_token table
+            wallet_tokens_ops.delete_all_wallet_tokens()
 
-            # Insert new token into DB
+            # Insert tokens
             for token in wallet_cache:
-                if token["mint"] not in db_mints:
-                    # Insert new token into DB
-                    insert_wallet_token(
-                        mint=token["mint"],
-                        symbol=token["symbol"],
-                        purchase_price=token["purchase_price"],
-                        usdt_value=token["usdt_value"])
+                wallet_tokens_ops.insert_wallet_token(
+                    mint=token["mint"],
+                    symbol=token["symbol"],
+                    purchase_price=token["purchase_price"],
+                    usdt_value=token["usdt_value"])
             
             # Update the last sync time
             update_last_sync_time('wallet')
