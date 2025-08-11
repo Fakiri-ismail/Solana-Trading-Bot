@@ -2,8 +2,11 @@ from datetime import datetime
 from exchanges.jupiter import pro
 from database.db_sync import cache_manager
 from telegram.hunter_bot import HunterBot
-from helpers.json_helpers import delete_file
+from helpers.utils import setup_logging
 
+
+# Init logging
+setup_logging('logs/top_trading.log')
 
 if __name__ == "__main__":
 
@@ -11,17 +14,16 @@ if __name__ == "__main__":
     top_pools_cache = cache_manager.load_top_trading_pools_cache()
     mints_cache = [pool['mint'] for pool in top_pools_cache]
     
-    # Get new top trading poools
+    # Get top trading poools
     params = {
         'minNetVolume1h': 100,
-        'minNumNetBuyers1h': 0,
+        'minNumNetBuyers1h': 10,
         'minMcap': 800_000,
         'maxMcap': 500_000_000
     }
     pools = pro.get_toptrending(timeframe='1h', params=params).get('pools', {})
 
     # Filter and Update Data
-    #top_trading_pools = []
     for pool in pools:
         token_info = pool.get('baseAsset', {})
         mint = token_info.get('id')
@@ -32,7 +34,6 @@ if __name__ == "__main__":
                 result['holderCount'] = token_info.get('holderCount')
                 result['mcap'] = token_info.get('mcap')
                 result['appearance'] +=1
-                #top_trading_pools.append(result)
             else:
                 # Add New Token
                 top_pools_cache.append(
