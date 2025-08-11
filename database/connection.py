@@ -1,4 +1,4 @@
-import psycopg2
+import psycopg2, logging
 from psycopg2.extras import RealDictCursor
 from contextlib import contextmanager
 from .config import DATABASE_URL
@@ -74,4 +74,4 @@ def init_db():
         )
         """)
         
-        print(">> Base de données initialisée avec succès!")
+        logging.info(">> Database initialized successfully!")

@@ -1,4 +1,4 @@
-import requests, base58, asyncio
+import requests, base58, asyncio, logging
 
 from solders.keypair import Keypair
 from solders.pubkey import Pubkey
@@ -70,7 +70,7 @@ class WalletManager():
                         })
             return tokens
         except requests.exceptions.HTTPError as e:
-            print(f"Erreur HTTP: {e}")
+            logging.error(f"Erreur HTTP: {e}")
 
     def get_token(self, mint_or_symbol: str) -> dict:
         """Get info for a specific token by symbol or mint address"""

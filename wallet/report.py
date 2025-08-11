@@ -1,4 +1,4 @@
-import calendar
+import calendar, logging
 import matplotlib.pyplot as plt
 from datetime import datetime
 from telegram.hunter_bot import HunterBot
@@ -40,4 +40,4 @@ def send_wallet_history_report():
         photo_path = "wallet/wallet_balance_chart.png"
         caption = f"Wallet Report for {month_name} {today.year}:\n📈 PNL : {pnl:.2f}$ ({pnl_pct:.2f}%)"
         hunter.send_photo(photo_path, caption)
-        print("Wallet history report sent successfully.")
+        logging.info("Wallet history report sent successfully.")

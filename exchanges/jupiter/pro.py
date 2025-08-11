@@ -1,4 +1,4 @@
-import requests
+import requests, logging
 
 
 base_url = "https://datapi.jup.ag/v1/pools"
@@ -31,7 +31,7 @@ def get_toptrending(timeframe: str='24h', params: dict = {}) -> dict:
         response.raise_for_status()
         return response.json()
     except requests.RequestException as e:
-        print(f"JUP API : Error fetching top trending pools\n >> {e}")
+        logging.error(f"JUP API : Error fetching top trending pools\n >> {e}")
         return {}
 
 

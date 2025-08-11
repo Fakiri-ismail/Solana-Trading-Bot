@@ -1,4 +1,4 @@
-import os, json
+import os, json, logging
 
 
 def read_json_file(file_path):
@@ -30,6 +30,6 @@ def add_json_record(file_path: str, record) -> None:
 def delete_file(file_path):
     if os.path.exists(file_path):
         os.remove(file_path)
-        print("File deleted.")
+        logging.info("File deleted.")
     else:
-        print("File not found.")
+        logging.warning(f"File '{file_path}'not found.")

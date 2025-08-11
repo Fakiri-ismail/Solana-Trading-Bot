@@ -1,4 +1,4 @@
-import requests
+import requests, logging
 from typing import List
 from solders.pubkey import Pubkey
 from solders.signature import Signature
@@ -28,7 +28,7 @@ def get_wallet_signatures(public_key, before=None, until=None, limit=None, commi
         signatures = sol_client.get_signatures_for_address(wallet, before=before, until=until, limit=limit, commitment=commitment)
         return [str(sig.signature) for sig in signatures.value if sig.err is None]
     except Exception as e:
-        print(f"[Get Wallet Signatures] {e}")
+        logging.error(f"Get Wallet Signatures Error:\n >> {e}")
         return []
 
 
@@ -50,13 +50,13 @@ def get_signature_status(tx_signature: str) -> bool:
     response = requests.post(SOL_URI, json=payload)
     status = response.json()['result']['value'][0]
     if status is None:
-        print(f"Transaction '{tx_signature}' not found")
+        logging.warning(f"Transaction '{tx_signature}' not found")
         return False
     elif status['confirmationStatus'] == 'finalized':
-        print(f"Transaction '{tx_signature}' is finalized")
+        logging.info(f"Transaction '{tx_signature}' is finalized")
         return True
     else:
-        print(f"Transaction '{tx_signature}' is not finalized yet. Current status: {status['confirmationStatus']}")
+        logging.info(f"Transaction '{tx_signature}' is not finalized yet. Current status: {status['confirmationStatus']}")
         return False
 
 
@@ -86,9 +86,9 @@ def get_transaction_data(signatures):
             transactions_data = transactions_data + response.json()
         return transactions_data
     except requests.exceptions.HTTPError as e:
-        print(f"HTTP Error [{response.status_code}]: {e}")
+        logging.error(f"HTTP Error [{response.status_code}]: {e}")
     except Exception as e:
-        print(f"Error [{response.status_code}]: {e}")
+        logging.error(f"Error [{response.status_code}]: {e}")
 
 
 def get_swap_data(tx_signature: str) -> dict:
@@ -100,14 +100,14 @@ def get_swap_data(tx_signature: str) -> dict:
     transaction_data = get_transaction_data([tx_signature])
     # Check if the transaction data is empty
     if not transaction_data:
-        print(f"Swap data not found for : {tx_signature}")
+        logging.warning(f"Swap data not found for : {tx_signature}")
         return None
     transaction_data = transaction_data[0]
 
     # Check if the transaction has an error 
     transaction_error = transaction_data.get("transactionError")
     if transaction_error:
-        print(f"Transaction error detected for : {tx_signature}")
+        logging.error(f"Transaction error detected for : {tx_signature}")
         return None
     
     # Check if the transaction is a swap transaction
@@ -154,7 +154,7 @@ def get_swap_data(tx_signature: str) -> dict:
                 "decimals": 0
             }
         else:
-            print(f"Token input data not found for : {tx_signature}")
+            logging.warning(f"Token input data not found for : {tx_signature}")
             token_input = None
         
         ## Extract the token output data
@@ -172,7 +172,7 @@ def get_swap_data(tx_signature: str) -> dict:
                 "decimals": token_output_data.get("rawTokenAmount", {}).get("decimals")
             }
         else:
-            print(f"Token output data not found for : {tx_signature}")
+            logging.warning(f"Token output data not found for : {tx_signature}")
             token_output = None
 
     return {

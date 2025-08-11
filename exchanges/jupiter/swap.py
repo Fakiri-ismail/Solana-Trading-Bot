@@ -1,4 +1,4 @@
-import requests, base64, json, re
+import requests, base64, json, re, logging
 
 from solders import message
 from solders.transaction import VersionedTransaction
@@ -69,6 +69,6 @@ async def send_transaction(payer, swap_transaction):
         # Extract the error message
         error_message = re.search(r'Error Message: (.*?)\.', e)
         error_message = error_message.group(1) if error_message else "No error message found"
-        print(f"RPC Error: \n- {msg} \n- {error_message}")
+        logging.error(f"RPC Error:\n >> Message:{msg}\n >> Error Message: {error_message}")
     except Exception as e:
-        print(f"Error during swap transaction : {e}")
+        logging.error(f"Error during swap transaction :\n >> {e}")

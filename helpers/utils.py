@@ -32,5 +32,5 @@ def format_number(num):
         else:
             return str(num)
     except Exception as e:
-        print(f"Error formatting number: {e}")
+        logging.error(f"Error formatting number:\n >> {e}")
         return "O"
