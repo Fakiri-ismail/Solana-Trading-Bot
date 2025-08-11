@@ -1,7 +1,14 @@
-import logging
+import os, logging
 
 
 def setup_logging(log_file):
+    """
+    Setup logging configuration
+    """
+    # Create the folder (and subfolders if necessary) if they do not exist
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
+
+    # Configure logging
     logging.basicConfig(
         filename=log_file,
         filemode='a',
@@ -10,7 +17,11 @@ def setup_logging(log_file):
         datefmt='%Y-%m-%d %H:%M:%S'
     )
 
+
 def format_number(num):
+    """
+    Format a number into a human-readable string.
+    """
     try:
         if num >= 10**9:
             return f"{num / 10**9:.2f}B"
