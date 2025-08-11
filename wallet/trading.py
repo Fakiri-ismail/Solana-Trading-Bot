@@ -46,7 +46,7 @@ async def main():
     for token in wallet_assets:
         token_actual_price = getJupPrice(token["mint"])
         if not token_actual_price:
-            logging.warning(f"JUP API : '{token['symbol']}' price not found ({token["mint"]})")
+            logging.warning(f"JUP API : '{token['symbol']}' price not found ({token['mint']})")
             continue
         token_usd_value = token_actual_price * (token.get("balance", 0) / 10 ** token.get("decimals", 0))
 
