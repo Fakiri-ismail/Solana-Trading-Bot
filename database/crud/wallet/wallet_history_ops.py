@@ -131,6 +131,7 @@ def get_wallet_history_by_date_range(start_date: datetime, end_date: datetime):
             """
             SELECT * FROM wallet_history 
             WHERE date BETWEEN %s AND %s
+            ORDER BY date
             """,
             (start_date, end_date)
         )
