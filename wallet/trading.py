@@ -13,7 +13,7 @@ from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL, USDC
 # Init logging
 setup_logging('logs/trading.log')
 # Reduce Solana RPC logs
-logging.getLogger("solana.rpc._client").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 sol_price = getJupPrice(WSOL)
 if not sol_price:
