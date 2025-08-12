@@ -41,4 +41,4 @@ if __name__ == "__main__":
     )
 
     # Send the wallet report at the end of the month
-    report.send_wallet_history_report()
+    report.send_monthly_wallet_report()
