@@ -93,6 +93,30 @@ def get_trading_history_by_token(mint: str) -> List[TradingHistory]:
             for row in cursor.fetchall()
         ]
 
+def get_trading_history_by_date_range(start_date: datetime, end_date: datetime) -> List[TradingHistory]:
+    with get_cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT * FROM trading_history
+            WHERE date BETWEEN %s AND %s
+            ORDER BY date
+            """,
+            (start_date, end_date)
+        )
+
+        return [
+            TradingHistory(
+                id=row['id'],
+                mint=row['mint'],
+                symbol=row['symbol'],
+                usdt_value=row['usdt_value'],
+                buy_price=row['buy_price'],
+                sell_price=row['sell_price'],
+                date=row['date']
+            )
+            for row in cursor.fetchall()
+        ]
+
 def delete_trading_history(history_id: int) -> bool:
     with get_cursor() as cursor:
         cursor.execute(
