@@ -1,7 +1,7 @@
 import calendar, logging
 import matplotlib.pyplot as plt
 from datetime import datetime
-from telegram.hunter_bot import HunterBot
+from telegram_bots.hunter_bot import HunterBot
 from database.crud.wallet import wallet_history_ops, trading_history_ops
 
 

@@ -1,5 +1,5 @@
 import asyncio, logging, sys
-from telegram.hunter_bot import HunterBot
+from telegram_bots.hunter_bot import HunterBot
 from wallet.manager import WalletManager
 from helpers.wallet_helpers import get_swap_data
 from helpers.utils import setup_logging
