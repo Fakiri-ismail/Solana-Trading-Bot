@@ -1,4 +1,5 @@
 import requests, logging
+from helpers import utils
 
 
 base_url = "https://datapi.jup.ag/v1/pools"
@@ -23,9 +24,7 @@ def get_toptrending(timeframe: str='24h', params: dict = {}) -> dict:
     """
     params = {**params, 'mintAuthorityDisabled': 'true', 'freezeAuthorityDisabled': 'true'}
     url = f'{base_url}/toptrending/{timeframe}?'
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) Python Requests'
-    }
+    headers = {'User-Agent': utils.get_random_user_agent()}
     try:
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
