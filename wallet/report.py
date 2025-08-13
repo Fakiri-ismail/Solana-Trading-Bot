@@ -1,8 +1,11 @@
 import calendar, logging
 import matplotlib.pyplot as plt
 from datetime import datetime
-from telegram_bots.hunter_bot import HunterBot
+from database.db_sync import cache_manager
 from database.crud.wallet import wallet_history_ops, trading_history_ops
+from exchanges.jupiter.price import getJupPrice
+from telegram_bots.hunter_bot import HunterBot
+from global_config import WSOL, USDC
 
 
 
@@ -68,6 +71,30 @@ def trading_history_report(start_date: datetime, end_date: datetime):
     plt.savefig("wallet/win_rate_chart.png", dpi=300, bbox_inches='tight')
 
     return round(win_rate, 2)
+
+def wallet_tokens_report():
+    wallet_tokens_data = cache_manager.load_wallet_cache()
+    if not wallet_tokens_data:
+        logging.warning("No data found in wallet cache file.")
+        return "❌ No data found."
+
+    msg = '📊 Wallet Report:\n'
+    for token in wallet_tokens_data:
+        if token['mint'] in [WSOL, USDC]:
+            continue
+        token_price = getJupPrice(token["mint"])
+        if not token_price:
+            continue
+        moji = "🟢" if token['purchase_price'] < token_price else "🔴"
+        pnl_pct = (token_price - token['purchase_price'])/token['purchase_price'] * 100
+        msg += f"- <b>{token['symbol']}</b> : {moji} PNL: <b>{pnl_pct:.2f}%</b>\n"
+        dex_url = f"https://dexscreener.com/solana/{token['mint']}"
+        msg += f"🔗 <a href='{dex_url}'>DEX</a>\n"
+    
+    if msg == '📊 Wallet Report:\n':
+        msg += "❌ No SPL tokens found in the wallet."
+
+    return msg
     
 
 def send_monthly_wallet_report():
