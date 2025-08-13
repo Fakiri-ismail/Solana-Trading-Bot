@@ -1,5 +1,8 @@
 SOL_PROJECT_PATH=/path/to/solana-trading-bot
 
+# Run telegram bot
+@reboot $SOL_PROJECT_PATH/scripts/telegram_bot.sh >> $SOL_PROJECT_PATH/test.log 2>&1
+
 # Run every day at 4pm
 0 16 * * * $SOL_PROJECT_PATH/scripts/wallet_history.sh >> $SOL_PROJECT_PATH/test.log 2>&1
 
