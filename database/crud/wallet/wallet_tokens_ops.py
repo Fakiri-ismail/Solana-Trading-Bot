@@ -17,6 +17,7 @@ def insert_wallet_token(mint: str, symbol: str, usdt_value: Decimal = None,
         )
         return cursor.fetchone()['id']
 
+
 def get_wallet_token(mint: str = None) -> Optional[WalletToken]:
     with get_cursor() as cursor:
         cursor.execute(
@@ -38,6 +39,7 @@ def get_wallet_token(mint: str = None) -> Optional[WalletToken]:
             )
         return None
 
+
 def get_all_wallet_tokens() -> List[WalletToken]:
     with get_cursor() as cursor:
         cursor.execute(
@@ -57,6 +59,7 @@ def get_all_wallet_tokens() -> List[WalletToken]:
             )
             for row in cursor.fetchall()
         ]
+
 
 def update_wallet_token(token_id: int = None, mint: str = None, usdt_value: Decimal = None,
                        symbol: str = None, purchase_price: Decimal = None) -> bool:
@@ -105,29 +108,21 @@ def update_wallet_token(token_id: int = None, mint: str = None, usdt_value: Deci
         
         return cursor.rowcount > 0
 
-def delete_wallet_token(token_id: int = None, mint: str = None) -> bool:
-    if token_id is None and mint is None:
-        raise ValueError("You must provide either token_id or mint")
-    
+
+def delete_wallet_token(mint: str = None) -> bool:
+    if mint is None:
+        raise ValueError("You must provide a mint")
+
     with get_cursor() as cursor:
-        if token_id is not None:
-            cursor.execute(
-                """
-                DELETE FROM wallet_token
-                WHERE id = %s
-                """,
-                (token_id,)
-            )
-        else:
-            cursor.execute(
-                """
-                DELETE FROM wallet_token
-                WHERE mint = %s
-                """,
-                (mint,)
-            )
-        
+        cursor.execute(
+            """
+            DELETE FROM wallet_token
+            WHERE mint = %s
+            """,
+            (mint,)
+        )
         return cursor.rowcount > 0
+
 
 def delete_all_wallet_tokens() -> bool:
     with get_cursor() as cursor:

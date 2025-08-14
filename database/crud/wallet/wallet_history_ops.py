@@ -30,43 +30,6 @@ def create_wallet_history(balance_usdt: Decimal, balance_sol: Decimal, date: dat
         )
         return cursor.fetchone()['id']
 
-def get_wallet_history(history_id: int) -> WalletHistory:
-    """
-    Retrieves a specific wallet history entry by its ID.
-    Args:
-        history_id: ID of the wallet history entry
-    Returns:
-        WalletHistory: The wallet history entry
-    """
-    with get_cursor() as cursor:
-        cursor.execute(
-            """
-            SELECT * FROM wallet_history 
-            WHERE id = %s
-            """,
-            (history_id,)
-        )
-        data = cursor.fetchone()
-        
-        if data:
-            return WalletHistory(
-                id=data['id'],
-                date=data['date'],
-                balance_usdt=data['balance_usdt'],
-                balance_sol=data['balance_sol']
-            )
-        return None
-
-def delete_wallet_history(history_id: int) -> bool:
-    with get_cursor() as cursor:
-        cursor.execute(
-            """
-            DELETE FROM wallet_history
-            WHERE id = %s
-            """,
-            (history_id,)
-        )
-        return cursor.rowcount > 0
 
 def get_all_wallet_history(limit: int = 100, offset: int = 0):
     """
@@ -97,6 +60,7 @@ def get_all_wallet_history(limit: int = 100, offset: int = 0):
             for row in cursor.fetchall()
         ]
 
+
 def get_latest_wallet_history() -> WalletHistory:
     with get_cursor() as cursor:
         cursor.execute(
@@ -116,6 +80,7 @@ def get_latest_wallet_history() -> WalletHistory:
                 balance_sol=data['balance_sol']
             )
         return None
+
 
 def get_wallet_history_by_date_range(start_date: datetime, end_date: datetime):
     """
@@ -145,3 +110,15 @@ def get_wallet_history_by_date_range(start_date: datetime, end_date: datetime):
             )
             for row in cursor.fetchall()
         ]
+
+
+def delete_wallet_history(history_id: int) -> bool:
+    with get_cursor() as cursor:
+        cursor.execute(
+            """
+            DELETE FROM wallet_history
+            WHERE id = %s
+            """,
+            (history_id,)
+        )
+        return cursor.rowcount > 0

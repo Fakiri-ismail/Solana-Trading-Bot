@@ -8,6 +8,9 @@ from database.models.wallet import TradingHistory
 def create_trading_history(mint: str, symbol: str, usdt_value: Decimal,
                            buy_price: Optional[Decimal] = None, sell_price: Optional[Decimal] = None,
                            date: Optional[datetime] = None) -> int:
+    """
+    Create a new trading history record.
+    """
     if date is None:
         date = datetime.now()
         
@@ -22,30 +25,14 @@ def create_trading_history(mint: str, symbol: str, usdt_value: Decimal,
         )
         return cursor.fetchone()['id']
 
-def get_trading_history(history_id: int) -> Optional[TradingHistory]:
-    with get_cursor() as cursor:
-        cursor.execute(
-            """
-            SELECT * FROM trading_history 
-            WHERE id = %s
-            """,
-            (history_id,)
-        )
-        data = cursor.fetchone()
-        
-        if data:
-            return TradingHistory(
-                id=data['id'],
-                mint=data['mint'],
-                symbol=data['symbol'],
-                usdt_value=data['usdt_value'],
-                buy_price=data['buy_price'],
-                sell_price=data['sell_price'],
-                date=data['date']
-            )
-        return None
 
 def get_all_trading_history(limit: int = 100, offset: int = 0) -> List[TradingHistory]:
+    """
+    Get all trading history records.
+    args:
+        limit (int): The maximum number of records to return.
+        offset (int): The number of records to skip before starting to collect the result set.
+    """
     with get_cursor() as cursor:
         cursor.execute(
             """
@@ -69,7 +56,11 @@ def get_all_trading_history(limit: int = 100, offset: int = 0) -> List[TradingHi
             for row in cursor.fetchall()
         ]
 
+
 def get_trading_history_by_token(mint: str) -> List[TradingHistory]:
+    """
+    Get trading history records for a specific token.
+    """
     with get_cursor() as cursor:
         cursor.execute(
             """
@@ -93,7 +84,11 @@ def get_trading_history_by_token(mint: str) -> List[TradingHistory]:
             for row in cursor.fetchall()
         ]
 
+
 def get_trading_history_by_date_range(start_date: datetime, end_date: datetime) -> List[TradingHistory]:
+    """
+    Get trading history records within a specific date range.
+    """
     with get_cursor() as cursor:
         cursor.execute(
             """
@@ -117,7 +112,11 @@ def get_trading_history_by_date_range(start_date: datetime, end_date: datetime) 
             for row in cursor.fetchall()
         ]
 
+
 def delete_trading_history(history_id: int) -> bool:
+    """
+    Delete a trading history record by its ID.
+    """
     with get_cursor() as cursor:
         cursor.execute(
             """
