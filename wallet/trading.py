@@ -12,15 +12,14 @@ from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL, USDC
 
 # Init logging
 setup_logging('logs/trading.log')
-# Reduce Solana RPC logs
-logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)    # Reduce Solana RPC logs
 
 sol_price = getJupPrice(WSOL)
 if not sol_price:
     logging.error("JUP API : Solana price not found")
     sys.exit(1)
 
-async def main():
+async def trading_bot():
     # Load the wallet cache
     wallet_cache = cache_manager.load_wallet_cache()
     if not wallet_cache:
@@ -112,8 +111,9 @@ async def main():
     # Save wallet cache
     cache_manager.save_wallet_cache(wallet_cache)
 
-    # Update the database
+    # sync cache with database every hour
     cache_manager.sync_wallet_with_db()
 
 
-asyncio.run(main())
+# Script runs every 2 minutes using crontab
+asyncio.run(trading_bot())
