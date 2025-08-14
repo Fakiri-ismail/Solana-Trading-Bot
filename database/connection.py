@@ -67,10 +67,10 @@ def init_db():
 
         # Top Memes
         cursor.execute("""
-        CREATE TABLE IF NOT EXISTS top_meme (
+        CREATE TABLE IF NOT EXISTS top_trading_tokens (
             id SERIAL PRIMARY KEY,
-            mint VARCHAR(255) NOT NULL UNIQUE,
-            symbol VARCHAR(50) NOT NULL
+            date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            top_tokens JSONB NOT NULL
         )
         """)
         
