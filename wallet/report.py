@@ -92,17 +92,14 @@ def wallet_tokens_report():
         })
     sorted_data = sorted(data, key=lambda x: x["pnl_pct"], reverse=True)
 
-    msg = '📊 Wallet Report:\n<pre>\n'
+    msg = '📊 Wallet Report:\n'
     for token in sorted_data:
         moji = "🟢" if token['pnl_pct'] > 0 else "🔴"
-        msg += f"- <b>{token['symbol']:<10}</b> {moji} PNL: <b>{token['pnl_pct']:.2f}%</b>\n"
         dex_url = f"https://dexscreener.com/solana/{token['mint']}"
-        msg += f"🔗 <a href='{dex_url}'>DEX</a>\n"
+        msg += f"- {moji} <b><a href='{dex_url}'>{token['symbol']}</a></b> : <b>{token['pnl_pct']:.2f}%</b>\n"
     
     if msg == '📊 Wallet Report:\n':
         msg += "❌ No SPL tokens found in the wallet."
-    
-    msg += '</pre>'
 
     return msg
     
