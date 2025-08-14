@@ -10,8 +10,7 @@ from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL
 # Init logging
 setup_logging('logs/wallet_history.log')
 
-if __name__ == "__main__":
-
+def add_wallet_history_record_to_db() -> int:
     my_wallet = WalletManager(WALLET_PUB_KEY, WALLET_PRIV_KEY)
     wallet_assets = my_wallet.get_assets()
     
@@ -35,10 +34,16 @@ if __name__ == "__main__":
     if not sol_price:
         logging.warning("JUP API : Solana price not found")
     wallet_sol_value = wallet_usd_value / sol_price
-    create_wallet_history(
+    return create_wallet_history(
         balance_usdt=round(wallet_usd_value,3),
         balance_sol=round(wallet_sol_value,5)
     )
+
+# Script runs every day at 4:00 PM using crontab
+if __name__ == "__main__":
+    
+    # Add wallet history record to the database
+    add_wallet_history_record_to_db()
 
     # Send the wallet report at the end of the month
     report.send_monthly_wallet_report()
