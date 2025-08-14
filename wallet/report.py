@@ -78,16 +78,24 @@ def wallet_tokens_report():
         logging.warning("No data found in wallet cache file.")
         return "❌ No data found."
 
-    msg = '📊 Wallet Report:\n'
+    data = []
     for token in wallet_tokens_data:
         if token['mint'] in [WSOL, USDC]:
             continue
         token_price = getJupPrice(token["mint"])
         if not token_price:
             continue
-        moji = "🟢" if token['purchase_price'] < token_price else "🔴"
-        pnl_pct = (token_price - token['purchase_price'])/token['purchase_price'] * 100
-        msg += f"- <b>{token['symbol']}</b> : {moji} PNL: <b>{pnl_pct:.2f}%</b>\n"
+        data.append({
+            "mint": token['mint'],
+            "symbol": token['symbol'],
+            "pnl_pct": (token_price - token['purchase_price']) / token['purchase_price'] * 100
+        })
+    sorted_data = sorted(data, key=lambda x: x["pnl_pct"], reverse=True)
+
+    msg = '📊 Wallet Report:\n'
+    for token in sorted_data:
+        moji = "🟢" if token['pnl_pct'] > 0 else "🔴"
+        msg += f"- <b>{token['symbol']}</b> : {moji} PNL: <b>{token['pnl_pct']:.2f}%</b>\n"
         dex_url = f"https://dexscreener.com/solana/{token['mint']}"
         msg += f"🔗 <a href='{dex_url}'>DEX</a>\n"
     
