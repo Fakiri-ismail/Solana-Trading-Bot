@@ -77,13 +77,13 @@ class HunterBot:
     
     def send_top_trading_pools_message(self, top_trading_data):
         sorted_data = sorted(top_trading_data, key=lambda d: d["appearance"], reverse=True)
-        msg = "🔥​ TOP TRADING TOKENS:\n"
+        msg = "🔥​ TOP TRADING TOKENS:\n\n"
         for token in sorted_data[:10]:
-            msg += f"💎 <b>{token['symbol']}</b> : {token['appearance']} times\n"
-            msg += f"💰 Market Cap : <b>{format_number(token['mcap'])}$</b>\n"
             jup_url = f"https://jup.ag/tokens/{token['mint']}"
             dex_url = f"https://dexscreener.com/solana/{token['mint']}"
-            msg += f"🔗  <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>\n\n"
+            urls = f"🔗 <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>"
+            msg += f"💎 <b>{token['symbol']}</b> : {token['appearance']} times\n"
+            msg += f"💰 Mc : <b>{format_number(token['mcap'])}$</b>     {urls}\n\n"
 
         return self.send_message(msg)
 
