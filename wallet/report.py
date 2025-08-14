@@ -4,7 +4,7 @@ from datetime import datetime
 from database.db_sync import cache_manager
 from database.crud.wallet import wallet_history_ops, trading_history_ops
 from exchanges.jupiter.price import getJupPrice
-from telegram_bots.hunter_bot import HunterBot
+from telegram_bots.hunter.messenger import HunterBot
 from global_config import WSOL, USDC
 
 
