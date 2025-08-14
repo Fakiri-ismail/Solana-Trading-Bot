@@ -94,7 +94,7 @@ def wallet_tokens_report():
 
     msg = '📊 Wallet Report:\n'
     for token in sorted_data:
-        moji = "🟢" if token['pnl_pct'] > 0 else "🔴"
+        moji = "🟢" if token['pnl_pct'] >= 0 else "🔴"
         dex_url = f"https://dexscreener.com/solana/{token['mint']}"
         msg += f"- {moji} <b><a href='{dex_url}'>{token['symbol']}</a></b> : <b>{token['pnl_pct']:.2f}%</b>\n"
     
