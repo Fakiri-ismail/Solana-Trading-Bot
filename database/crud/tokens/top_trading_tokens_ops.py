@@ -1,3 +1,4 @@
+import json
 from typing import List
 from datetime import datetime
 from database.connection import get_cursor
@@ -12,7 +13,7 @@ def insert_top_trading_tokens(top_trading_tokens: List[dict]) -> int:
             VALUES (%s, %s)
             RETURNING id
             """,
-            (datetime.now(), top_trading_tokens)
+            (datetime.now(), json.dumps(top_trading_tokens))
         )
         return cursor.fetchone()['id']
 
