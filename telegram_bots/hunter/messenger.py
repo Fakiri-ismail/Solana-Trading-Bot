@@ -76,9 +76,8 @@ class HunterBot:
         return self.send_message(msg)
     
     def send_top_trading_pools_message(self, top_trading_data):
-        sorted_data = sorted(top_trading_data, key=lambda d: d["appearance"], reverse=True)
         msg = "🔥​ TOP TRADING TOKENS:\n\n"
-        for token in sorted_data[:10]:
+        for token in top_trading_data:
             jup_url = f"https://jup.ag/tokens/{token['mint']}"
             dex_url = f"https://dexscreener.com/solana/{token['mint']}"
             urls = f"🔗 <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>"
