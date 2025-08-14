@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
@@ -6,7 +6,7 @@ from typing import Optional
 class TopTradingTokens:
     id: Optional[int] = None
     date: datetime = None
-    top_tokens: list = []
+    top_tokens: list = field(default_factory=list)
 
     def __post_init__(self):
         if self.date is None:
