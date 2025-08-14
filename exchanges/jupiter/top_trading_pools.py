@@ -8,13 +8,14 @@ from helpers.utils import setup_logging
 # Init logging
 setup_logging('logs/top_trading.log')
 
+# Script runs every 15 minutes using crontab
 if __name__ == "__main__":
 
-    # Load top trading poools data
+    # Load top trading pools data
     top_pools_cache = cache_manager.load_top_trading_pools_cache()
     mints_cache = [pool['mint'] for pool in top_pools_cache]
-    
-    # Get top trading poools
+
+    # Get top trading pools
     params = {
         'minNetVolume1h': 100,
         'minNumNetBuyers1h': 10,
@@ -49,17 +50,18 @@ if __name__ == "__main__":
     # Save top trading poools data
     cache_manager.save_top_trading_pools_cache(top_pools_cache)
 
-    # Send a Telegram message every 4 hours
+    # Send a Telegram message every 3 hours
+    top_10 = sorted(top_pools_cache, key=lambda d: d["appearance"], reverse=True)[:10]
     last_send_time = cache_manager.get_last_sync_time('top_trading_telegram')
     if last_send_time:
         now = datetime.now()
-        delta = (now - last_send_time).total_seconds() > 3600 * 4
+        delta = (now - last_send_time).total_seconds() > 3600 * 3
         if delta:
             hunter = HunterBot()
-            hunter.send_top_trading_pools_message(top_pools_cache)
+            hunter.send_top_trading_pools_message(top_10)
             cache_manager.update_last_sync_time('top_trading_telegram')
     else:
         cache_manager.update_last_sync_time('top_trading_telegram')
 
     # Synchronize the database and clear the cache every day
-    cache_manager.sync_top_trading_pools_with_db()
+    cache_manager.sync_top_trading_pools_with_db(top_10)
