@@ -35,7 +35,7 @@ def sign_transaction(payer, transaction: str):
     return base64.b64encode(serialized_transaction).decode('utf-8')
 
 """
-/!\ Problem to solve => HTTP Error: 504 Gateway Timeout
+Problem to solve => HTTP Error: 504 Gateway Timeout
 """
 def execute(signed_tx: str, request_id: str):
     payload = json.dumps({
