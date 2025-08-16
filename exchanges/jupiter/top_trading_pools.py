@@ -25,14 +25,11 @@ if __name__ == "__main__":
     }
 
     # Retry fetching data
-    retry, result = 0, False
-    while not result and retry < 3:
+    for i in range(3):
         pools = pro.get_toptrending(timeframe='1h', params=params).get('pools', {})
         if pools:
-            result = True
-        else:
-            logging.warning(f"No pools found : Retry {retry + 1} ")
-            retry += 1
+            break
+        logging.warning(f"No pools found : Retry {i + 1} ")
 
     # Filter and Update Data
     for pool in pools:

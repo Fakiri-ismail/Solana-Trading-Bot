@@ -5,6 +5,18 @@ from global_config import USDC
 
 def getJupPrice(mint: str, vs_token: str =USDC) -> float:
     """
+    Retry 3 times to get the price of a token using the Jupiter API
+    """
+    for i in range(3):
+        price = get_price(mint, vs_token)
+        if price:
+            return price
+        logging.warning(f"Attempt {i + 1} failed")
+    return 0
+
+
+def get_price(mint: str, vs_token: str =USDC) -> float:
+    """
     Get the price of a token using the Jupiter API
     - mint: all mint address separated by a comma
     - vs_token: The token to compare against (default is USDC)
