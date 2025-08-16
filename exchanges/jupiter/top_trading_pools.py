@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from exchanges.jupiter import pro
 from database.db_sync import cache_manager
@@ -22,7 +23,16 @@ if __name__ == "__main__":
         'minMcap': 800_000,
         'maxMcap': 500_000_000
     }
-    pools = pro.get_toptrending(timeframe='1h', params=params).get('pools', {})
+
+    # Retry fetching data
+    retry, result = 0, False
+    while not result and retry < 3:
+        pools = pro.get_toptrending(timeframe='1h', params=params).get('pools', {})
+        if pools:
+            result = True
+        else:
+            logging.warning(f"No pools found : Retry {retry + 1} ")
+            retry += 1
 
     # Filter and Update Data
     for pool in pools:
