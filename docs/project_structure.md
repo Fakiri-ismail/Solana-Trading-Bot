@@ -30,15 +30,15 @@
         📂 db_sync/
             🐍 cache_manager.py
         📂 crud/
-            📂 coins/
-                🐍 top_memes_ops.py
+            📂 tokens/
+                🐍 top_trading_tokens_ops.py
             📂 wallet/
                 🐍 wallet_tokens_ops.py
                 🐍 trading_history_ops.py
                 🐍 wallet_history_ops.py
         📂 models/
             🐍 wallet.py
-            🐍 coins.py
+            🐍 tokens.py
     📂 helpers/
         🐍 generate_roadmap.py
         🐍 wallet_helpers.py
@@ -49,6 +49,7 @@
         📄 top_trading_pools.sh
         📄 wallet_history.sh
         📄 telegram_bot.sh
+    📂 logs/
     📂 wallet/
         🐍 trading.py
         🐍 report.py
@@ -109,6 +110,7 @@
 
 #### Functions:
 - `getJupPrice`
+- `get_price`
 
 ### `exchanges/jupiter/top_trading_pools.py`
 
@@ -136,12 +138,14 @@
 - `sync_wallet_with_db`
 - `sync_top_trading_pools_with_db`
 
-### `database/crud/coins/top_memes_ops.py`
+### `database/crud/tokens/top_trading_tokens_ops.py`
 
 #### Functions:
-- `insert_top_meme`
-- `get_all_top_memes`
-- `delete_top_meme`
+- `insert_top_trading_tokens`
+- `get_all_top_trading_tokens`
+- `get_last_top_trading_tokens`
+- `get_top_trading_tokens_by_date`
+- `delete_top_trading_tokens`
 
 ### `database/crud/wallet/wallet_tokens_ops.py`
 
@@ -157,7 +161,6 @@
 
 #### Functions:
 - `create_trading_history`
-- `get_trading_history`
 - `get_all_trading_history`
 - `get_trading_history_by_token`
 - `get_trading_history_by_date_range`
@@ -167,11 +170,10 @@
 
 #### Functions:
 - `create_wallet_history`
-- `get_wallet_history`
-- `delete_wallet_history`
 - `get_all_wallet_history`
 - `get_latest_wallet_history`
 - `get_wallet_history_by_date_range`
+- `delete_wallet_history`
 
 ### `database/models/wallet.py`
 #### Classes:
@@ -183,9 +185,12 @@
 - `__post_init__`
 - `__post_init__`
 
-### `database/models/coins.py`
+### `database/models/tokens.py`
 #### Classes:
-- `TopMeme`
+- `TopTradingTokens`
+
+#### Functions:
+- `__post_init__`
 
 ### `helpers/generate_roadmap.py`
 
@@ -220,7 +225,7 @@
 ### `wallet/trading.py`
 
 #### Functions:
-- `main`
+- `trading_bot`
 
 ### `wallet/report.py`
 
@@ -242,4 +247,7 @@
 - `swap_token`
 
 ### `wallet/history.py`
+
+#### Functions:
+- `add_wallet_history_record_to_db`
 
