@@ -88,7 +88,7 @@ def wallet_tokens_report():
         data.append({
             "mint": token['mint'],
             "symbol": token['symbol'],
-            "pnl_pct": (token_price - token['purchase_price']) / token['purchase_price'] * 100
+            "pnl_pct": (token_price - token['buy_price']) / token['buy_price'] * 100
         })
     sorted_data = sorted(data, key=lambda x: x["pnl_pct"], reverse=True)
 
