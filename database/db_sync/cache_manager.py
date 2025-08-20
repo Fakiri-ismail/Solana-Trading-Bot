@@ -63,7 +63,7 @@ def sync_wallet_with_db():
                 wallet_tokens_ops.insert_wallet_token(
                     mint=token["mint"],
                     symbol=token["symbol"],
-                    purchase_price=token["purchase_price"],
+                    buy_price=token["buy_price"],
                     usdt_value=token["usdt_value"])
             
             # Update the last sync time
