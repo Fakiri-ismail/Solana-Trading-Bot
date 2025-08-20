@@ -47,7 +47,7 @@ def init_db():
             id SERIAL PRIMARY KEY,
             mint VARCHAR(255) NOT NULL UNIQUE,
             symbol VARCHAR(50),
-            purchase_price DECIMAL(20, 8),
+            buy_price DECIMAL(20, 8),
             usdt_value DECIMAL(20, 8) NOT NULL
         )
         """)

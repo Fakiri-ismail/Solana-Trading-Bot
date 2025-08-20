@@ -5,15 +5,15 @@ from database.models.wallet import WalletToken
 
 
 def insert_wallet_token(mint: str, symbol: str, usdt_value: Decimal = None,
-                        purchase_price: Optional[Decimal] = None) -> int:
+                        buy_price: Optional[Decimal] = None) -> int:
     with get_cursor() as cursor:
         cursor.execute(
             """
-            INSERT INTO wallet_token (mint, symbol, purchase_price, usdt_value)
+            INSERT INTO wallet_token (mint, symbol, buy_price, usdt_value)
             VALUES (%s, %s, %s, %s)
             RETURNING id
             """,
-            (mint, symbol, purchase_price, usdt_value)
+            (mint, symbol, buy_price, usdt_value)
         )
         return cursor.fetchone()['id']
 
@@ -34,7 +34,7 @@ def get_wallet_token(mint: str = None) -> Optional[WalletToken]:
                 id=data['id'],
                 mint=data['mint'],
                 symbol=data['symbol'],
-                purchase_price=data['purchase_price'],
+                buy_price=data['buy_price'],
                 usdt_value=data['usdt_value']
             )
         return None
@@ -54,7 +54,7 @@ def get_all_wallet_tokens() -> List[WalletToken]:
                 id=row['id'],
                 mint=row['mint'],
                 symbol=row['symbol'],
-                purchase_price=row['purchase_price'],
+                buy_price=row['buy_price'],
                 usdt_value=row['usdt_value']
             )
             for row in cursor.fetchall()
@@ -62,7 +62,7 @@ def get_all_wallet_tokens() -> List[WalletToken]:
 
 
 def update_wallet_token(token_id: int = None, mint: str = None, usdt_value: Decimal = None,
-                       symbol: str = None, purchase_price: Decimal = None) -> bool:
+                       symbol: str = None, buy_price: Decimal = None) -> bool:
     if token_id is None and mint is None:
         raise ValueError("You must provide either token_id or mint")
     
@@ -72,14 +72,12 @@ def update_wallet_token(token_id: int = None, mint: str = None, usdt_value: Deci
     if symbol is not None:
         update_fields.append("symbol = %s")
         params.append(symbol)
-
     if usdt_value is not None:
         update_fields.append("usdt_value = %s")
-        params.append(usdt_value)
-        
-    if purchase_price is not None:
-        update_fields.append("purchase_price = %s")
-        params.append(purchase_price)
+        params.append(usdt_value)   
+    if buy_price is not None:
+        update_fields.append("buy_price = %s")
+        params.append(buy_price)
         
     if not update_fields:
         return False
