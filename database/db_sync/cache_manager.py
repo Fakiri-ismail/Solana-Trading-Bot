@@ -10,9 +10,22 @@ TOP_TRADING_CACHE_FILE = "database/db_sync/top_trading_cache.json"
 LAST_UPDATE_FILE = "database/db_sync/last_update.json"
 
 # Wallet chache
-def load_wallet_cache():
-    return json_helpers.read_json_file(WALLET_CACHE_FILE)
-    
+def load_wallet_cache() -> list:
+    wallet_data = json_helpers.read_json_file(WALLET_CACHE_FILE)
+    if not wallet_data:
+        # Get wallet tokens from the database
+        wallet_data = [
+            {
+                "mint": token.mint,
+                "symbol": token.symbol,
+                "buy_price": float(token.buy_price),
+                "usdt_value": float(token.usdt_value)
+            }
+            for token in wallet_tokens_ops.get_all_wallet_tokens()
+        ]
+        save_wallet_cache(wallet_data)
+    return wallet_data
+
 def save_wallet_cache(wallet_data):
     json_helpers.write_json_file(WALLET_CACHE_FILE, wallet_data)
 
