@@ -31,7 +31,8 @@ def save_wallet_cache(wallet_data):
 
 # Top Trading pools cache
 def load_top_trading_pools_cache():
-    return json_helpers.read_json_file(TOP_TRADING_CACHE_FILE)
+    top_trading_pools = json_helpers.read_json_file(TOP_TRADING_CACHE_FILE)
+    return top_trading_pools if top_trading_pools else []
 
 def save_top_trading_pools_cache(top_trading_data):
     json_helpers.write_json_file(TOP_TRADING_CACHE_FILE, top_trading_data)

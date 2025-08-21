@@ -14,6 +14,9 @@ logging.getLogger("httpx").setLevel(logging.WARNING)    # Reduce Solana RPC logs
 
 # Trading Parameters
 trading_params = json_helpers.read_json_file('resources/params/trading_params.json')
+if not trading_params:
+    logging.warning("Trading parameters not found. Please set them in 'resources/params/trading_params.json'")
+    trading_params = {"stopLoss": 0.5, "takeProfit": 0.8}  # Default values
 
 sol_price = getJupPrice(WSOL)
 if not sol_price:
@@ -63,8 +66,8 @@ async def trading_bot():
                 
                 # Check if the price is above take profit or below stop loss
                 buy_price = float(cache_token["buy_price"])
-                take_profit_price = buy_price * (1 + trading_params.get("takeProfit", 0.8))
-                stop_loss_price = buy_price * (1 - trading_params.get("stopLoss", 0.5))
+                take_profit_price = buy_price * (1 + trading_params["takeProfit"])
+                stop_loss_price = buy_price * (1 - trading_params["stopLoss"])
 
                 if actual_price >= take_profit_price or actual_price <= stop_loss_price:
                     result = await my_wallet.swap_token(in_mint=token["mint"], out_mint=WSOL, pct_amount=100)
