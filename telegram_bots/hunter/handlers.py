@@ -1,15 +1,22 @@
-from telegram_bots.hunter import markup
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram import Update, CallbackQuery
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
-from wallet import report
+from telegram_bots.hunter import markup
 from telegram_bots.hunter import messages
+from wallet import report
+from helpers import json_helpers
+
+
+# Temporary storage of user choice
+user_data = {}
 
 
 # Start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = "🤔 What would you like to do ?"
     await update.message.reply_text(msg, reply_markup=markup.start_markup())
+
 
 # Handle button presses
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -23,57 +30,62 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "trading_settings":
         await query.edit_message_text("⚙️ Trading Settings :", reply_markup=markup.trading_settings_markup())
     
-    elif query.data == "display_settings":
-        msg = messages.trading_settings_msg()
-        await query.edit_message_text(msg, reply_markup=markup.display_settings_markup())
-    
+    else:
+        if query.data in ["display_settings", "update_settings", "start_menu"]:
+            await settings_handler(query)
+        
+        elif query.data in ["update_sl", "update_tp"]:
+            await trade_settings_handler(query)
+
+
+async def settings_handler(query: CallbackQuery):
+    if query.data == "display_settings":
+        msg = messages.display_trade_settings()
+        back_markup = InlineKeyboardMarkup([[InlineKeyboardButton('🔙 Back', callback_data="trading_settings")]])
+        await query.edit_message_text(msg, reply_markup=back_markup)
+
     elif query.data == "update_settings":
-        msg = "🔄 Update Trading Settings:"
+        msg = "🔄 which one do you want to update :"
         await query.edit_message_text(msg, reply_markup=markup.update_settings_markup())
-
-    elif query.data == "update_sl":
-        await query.edit_message_text("Enter your new stop loss\n👉 Example: 0.25 == -25%")
-        context.user_data["new_sl"] = True
-
-    elif query.data == "update_tp":
-        await query.edit_message_text("Enter your new take profit\n👉 Example: 0.5 == +50%")
-        context.user_data["new_tp"] = True
-
-    elif query.data == "main_menu":
+    
+    elif query.data == "start_menu":
         msg = "🤔 What would you like to do ?"
         await query.edit_message_text(msg, reply_markup=markup.start_markup())
 
-# Handle messages
-async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
 
-    if text == "/display":
+async def trade_settings_handler(query: CallbackQuery):
+    if query.data == "update_sl":
+        user_data[query.from_user.id] = "stopLoss"
+        await query.edit_message_text("✏️ Enter your new stop loss :\n   👉 Ex: 0.25 = -25%")
+
+    elif query.data == "update_tp":
+        user_data[query.from_user.id] = "takeProfit"
+        await query.edit_message_text("✏️ Enter your new take profit :\n   👉 Ex: 0.5 = +50%")
+
+
+# Handle message
+async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handler for the message entered by the user"""
+    user_id = update.message.from_user.id
+    msg = update.message.text
+    choice = user_data[user_id]
+
+    if msg == "/start":
         await start(update, context)
 
-    # elif text == "/refresh":
-    #     result = 'get_wallet_token_data()'
-    #     await update.message.reply_text(result)
-
-async def number_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if context.user_data.get("new_sl"):
+    if choice in ["stopLoss", "takeProfit"]:
         try:
-            number = float(update.message.text)
-            if 0 <= number <= 1:
-                await update.message.reply_text(f"✅ New Stop Loss : {number}")
+            value = float(msg)
+            if 0 < value <= 1:
+                result = json_helpers.update_json_record('resources/params/trading_params.json', choice, value)
+                if result and choice == "stopLoss":
+                    await update.message.reply_text(f"✅ New Stop Loss : -{round(value * 100, 2)}%")
+                elif result and choice == "takeProfit":
+                    await update.message.reply_text(f"✅ New Take Profit : +{round(value * 100, 2)}%")
+                else:
+                    await update.message.reply_text("❌ Failed to update settings. Please try again.")
+                del user_data[user_id]
             else:
-                await update.message.reply_text("❌ Please enter a number between 0 and 1.")
+                await update.message.reply_text("❌ Invalid value. Enter a number between 0 and 1.")
         except ValueError:
-            await update.message.reply_text("❌ Please enter a valid number.")
-        finally:
-            context.user_data["new_sl"] = False
-    elif context.user_data.get("new_tp"):
-        try:
-            number = float(update.message.text)
-            if 0 <= number <= 1:
-                await update.message.reply_text(f"✅ New Take Profit : {number}")
-            else:
-                await update.message.reply_text("❌ Please enter a number between 0 and 1.")
-        except ValueError:
-            await update.message.reply_text("❌ Please enter a valid number.")
-        finally:
-            context.user_data["new_tp"] = False
+            await update.message.reply_text("⚠️ Please enter a valid number.")
