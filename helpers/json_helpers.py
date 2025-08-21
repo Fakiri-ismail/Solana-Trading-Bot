@@ -5,10 +5,11 @@ def read_json_file(file_path):
     if os.path.exists(file_path):
         with open(file_path, "r") as f:
             content = f.read()
-            if not content.strip():
-                return []
-            return json.loads(content)
-    return []
+            if content.strip():
+                return json.loads(content)
+            logging.warning(f"File '{file_path}' is empty.")
+    else:
+        logging.warning(f"File '{file_path}' not found.")
 
 
 def write_json_file(file_path, data):
@@ -16,15 +17,13 @@ def write_json_file(file_path, data):
         json.dump(data, f, indent=4)
 
 
-def add_json_record(file_path: str, record) -> None:
+def update_json_record(file_path: str, key: str, value) -> bool:
     data = read_json_file(file_path)
-    
-    if type(record) is list:
-        data = data + record
-    else:
-        data.append(record)
-
-    write_json_file(file_path, data)
+    if data:
+        data[key] = value
+        write_json_file(file_path, data)
+        return True
+    return False
 
 
 def delete_file(file_path):
