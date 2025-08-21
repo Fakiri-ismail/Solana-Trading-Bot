@@ -11,6 +11,7 @@
             🐍 run.py
             🐍 markup.py
             🐍 messenger.py
+            🐍 messages.py
             🐍 handlers.py
     📂 docs/
         📝 project_structure.md
@@ -24,6 +25,8 @@
             🐍 top_trading_pools.py
     📂 resources/
         📜 user_agent.json
+        📂 params/
+            📜 trading_params.json
     📂 database/
         🐍 connection.py
         🐍 config.py
@@ -67,6 +70,8 @@
 
 #### Functions:
 - `start_markup`
+- `trading_settings_markup`
+- `update_settings_markup`
 
 ### `telegram_bots/hunter/messenger.py`
 #### Classes:
@@ -80,11 +85,18 @@
 - `send_swap_message`
 - `send_top_trading_pools_message`
 
+### `telegram_bots/hunter/messages.py`
+
+#### Functions:
+- `display_trade_settings`
+
 ### `telegram_bots/hunter/handlers.py`
 
 #### Functions:
 - `start`
 - `button_handler`
+- `settings_handler`
+- `trade_settings_handler`
 - `text_handler`
 
 ### `exchanges/jupiter/swap.py`
@@ -212,7 +224,7 @@
 #### Functions:
 - `read_json_file`
 - `write_json_file`
-- `add_json_record`
+- `update_json_record`
 - `delete_file`
 
 ### `helpers/utils.py`
@@ -226,6 +238,7 @@
 
 #### Functions:
 - `trading_bot`
+- `generate_swap_info`
 
 ### `wallet/report.py`
 
