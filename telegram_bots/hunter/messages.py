@@ -17,7 +17,7 @@ def top_trading_tokens_msg(start: int, end: int) -> str:
     top_trading_tokens = sorted(top_trading_tokens, key=lambda d: d["appearance"], reverse=True)
     msg = f"🔥​ TOP TRADING TOKENS from the position {start} to {end}:\n\n"
     i = start
-    for token in top_trading_tokens[start-1:end-1]:
+    for token in top_trading_tokens[start-1:end]:
         jup_url = f"https://jup.ag/tokens/{token['mint']}"
         dex_url = f"https://dexscreener.com/solana/{token['mint']}"
         urls = f"🔗 <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>"
