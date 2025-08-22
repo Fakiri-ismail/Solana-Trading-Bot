@@ -14,6 +14,7 @@ def top_trading_tokens_msg(start: int, end: int) -> str:
     top_trading_tokens = cache_manager.load_top_trading_pools_cache()
     if not top_trading_tokens:
         return "⚠️ No data found. Retry later."
+    top_trading_tokens = sorted(top_trading_tokens, key=lambda d: d["appearance"], reverse=True)
     msg = f"🔥​ TOP TRADING TOKENS from the position {start} to {end}:\n\n"
     i = start
     for token in top_trading_tokens[start-1:end-1]:
