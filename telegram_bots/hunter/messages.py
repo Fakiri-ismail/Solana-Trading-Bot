@@ -15,10 +15,12 @@ def top_trading_tokens_msg(start: int, end: int) -> str:
     if not top_trading_tokens:
         return "⚠️ No data found. Retry later."
     msg = f"🔥​ TOP TRADING TOKENS from the position {start} to {end}:\n\n"
+    i = start
     for token in top_trading_tokens[start-1:end-1]:
         jup_url = f"https://jup.ag/tokens/{token['mint']}"
         dex_url = f"https://dexscreener.com/solana/{token['mint']}"
         urls = f"🔗 <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>"
-        msg += f"💎 <b>{token['symbol']}</b> : {token['appearance']} times\n"
+        msg += f"<b>{i} - {token['symbol']}</b> : {token['appearance']} times\n"
         msg += f"💰 Mc : <b>{utils.format_number(token['mcap'])}$</b>     {urls}\n\n"
+        i += 1
     return msg
