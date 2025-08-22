@@ -3,8 +3,9 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 def start_markup():
     wallet_tokens = InlineKeyboardButton('💳 Wallet Tokens Report', callback_data="wallet_tokens")
+    top_trading_tokens = InlineKeyboardButton('🚀 Top Trading Tokens', callback_data="top_trading_tokens")
     trading_settings = InlineKeyboardButton('⚙️ Trading Settings', callback_data="trading_settings")
-    buttons = [[wallet_tokens], [trading_settings]]
+    buttons = [[wallet_tokens], [top_trading_tokens], [trading_settings]]
     return InlineKeyboardMarkup(buttons)
 
 def trading_settings_markup():

@@ -26,6 +26,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "wallet_tokens":
         msg = report.wallet_tokens_report()
         await query.edit_message_text(text=msg, parse_mode=ParseMode.HTML)
+    
+    elif query.data == "top_trading_tokens":
+        user_data[query.from_user.id] = "topTokens"
+        await query.edit_message_text("✏️ Enter an interval :\n   👉 Ex: 5 - 10")
 
     elif query.data == "trading_settings":
         await query.edit_message_text("⚙️ Trading Settings :", reply_markup=markup.trading_settings_markup())
@@ -89,3 +93,16 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await update.message.reply_text("❌ Invalid value. Enter a number between 0 and 1.")
         except ValueError:
             await update.message.reply_text("⚠️ Please enter a valid number.")
+    
+    elif choice == "topTokens":
+        inf, sup = msg.replace(" ", "").split('-')
+        try:
+            inf, sup = int(inf), int(sup)
+            if 0 < inf < sup <= 100:
+                msg = messages.top_trading_tokens_msg(inf, sup)
+                await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+                del user_data[user_id]
+            else:
+                await update.message.reply_text("❌ Invalid interval. Ensure that the interval is between 0 and 100.")
+        except ValueError:
+            await update.message.reply_text("⚠️ Please enter a valid interval, EX: 10 - 20")
