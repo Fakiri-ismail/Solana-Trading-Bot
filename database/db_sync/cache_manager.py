@@ -85,7 +85,7 @@ def sync_wallet_with_db():
     else:
         update_last_sync_time('wallet')
 
-def sync_top_trading_pools_with_db(top_10_pools: list):
+def sync_top_trading_pools_with_db(top_trading_tokens: list):
     """
     Sync the database with the local top trading pools cache.
     """
@@ -93,7 +93,8 @@ def sync_top_trading_pools_with_db(top_10_pools: list):
     if top_trading_last_sync:
         if (datetime.now() - top_trading_last_sync).days > 0:
             # Sync top trading pools cache with database
-            top_trading_tokens_ops.insert_top_trading_tokens(top_10_pools)
+            top_10 = sorted(top_trading_tokens, key=lambda d: d["appearance"], reverse=True)[:10]
+            top_trading_tokens_ops.insert_top_trading_tokens(top_10)
             # Clear the cache
             json_helpers.delete_file(TOP_TRADING_CACHE_FILE)
             # Update the last sync time

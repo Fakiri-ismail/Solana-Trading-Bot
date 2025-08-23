@@ -3,11 +3,12 @@ from datetime import datetime
 from exchanges.jupiter import pro
 from database.db_sync import cache_manager
 from telegram_bots.hunter.messenger import HunterBot
-from helpers.utils import setup_logging
+from telegram_bots.hunter import messages
+from helpers import utils
 
 
 # Init logging
-setup_logging('logs/top_trading.log')
+utils.setup_logging('logs/top_trading.log')
 
 # Script runs every 15 minutes using crontab
 if __name__ == "__main__":
@@ -58,17 +59,17 @@ if __name__ == "__main__":
     cache_manager.save_top_trading_pools_cache(top_pools_cache)
 
     # Send a Telegram message every 3 hours
-    top_10 = sorted(top_pools_cache, key=lambda d: d["appearance"], reverse=True)[:10]
     last_send_time = cache_manager.get_last_sync_time('top_trading_telegram')
     if last_send_time:
         now = datetime.now()
         delta = (now - last_send_time).total_seconds() > 3600 * 3
         if delta:
             hunter = HunterBot()
-            hunter.send_top_trading_pools_message(top_10)
+            msg = messages.top_trading_tokens_msg(top_pools_cache, start=1, end=10)
+            hunter.send_message(msg)
             cache_manager.update_last_sync_time('top_trading_telegram')
     else:
         cache_manager.update_last_sync_time('top_trading_telegram')
 
     # Synchronize the database and clear the cache every day
-    cache_manager.sync_top_trading_pools_with_db(top_10)
+    cache_manager.sync_top_trading_pools_with_db(top_pools_cache)

@@ -1,6 +1,5 @@
 import requests, os
 from dotenv import load_dotenv
-from helpers.utils import format_number
 
 
 load_dotenv()
@@ -74,17 +73,6 @@ class HunterBot:
         solscan_url = f"https://solscan.io/tx/{swap_info['transactionId']}"
         msg += f"🔀 <a href='{solscan_url}'>SolScan</a>"
         return self.send_message(msg)
-    
-    def send_top_trading_pools_message(self, top_trading_data):
-        msg = "🔥​ TOP TRADING TOKENS:\n\n"
-        for token in top_trading_data:
-            jup_url = f"https://jup.ag/tokens/{token['mint']}"
-            dex_url = f"https://dexscreener.com/solana/{token['mint']}"
-            urls = f"🔗 <a href='{dex_url}'>DEX</a> | <a href='{jup_url}'>JUP</a>"
-            msg += f"💎 <b>{token['symbol']}</b> : {token['appearance']} times\n"
-            msg += f"💰 Mc : <b>{format_number(token['mcap'])}$</b>     {urls}\n\n"
-
-        return self.send_message(msg)
 
 
 if __name__ == "__main__":
@@ -112,5 +100,3 @@ if __name__ == "__main__":
         {"mint": "Dz9mQ9NzkBcCsuGPFJ3r1bS4wgqKMHBPiVuniW8Mbonk", "symbol": "USELESS", "appearance": 5, "mcap": 207073097.5218624},
         {"mint": "7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3", "symbol": "SLERF", "appearance": 3, "mcap": 36912585.23428662},
     ]
-    # response = bot.send_top_trading_pools_message(top_trading_data)
-    # print(response)

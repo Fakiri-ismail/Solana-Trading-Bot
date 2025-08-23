@@ -2,10 +2,10 @@ from telegram import Update, CallbackQuery
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
-from telegram_bots.hunter import markup
-from telegram_bots.hunter import messages
-from wallet import report
+from telegram_bots.hunter import markup, messages
+from database.db_sync import cache_manager
 from helpers import json_helpers
+from wallet import report
 
 
 # Temporary storage of user choice
@@ -99,7 +99,8 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             inf, sup = int(inf), int(sup)
             if 0 < inf < sup <= 100:
-                msg = messages.top_trading_tokens_msg(inf, sup)
+                top_tokens = cache_manager.load_top_trading_pools_cache()
+                msg = messages.top_trading_tokens_msg(top_tokens, inf, sup)
                 await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
                 del user_data[user_id]
             else:
