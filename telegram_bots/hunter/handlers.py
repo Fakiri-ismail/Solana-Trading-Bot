@@ -28,8 +28,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(text=msg, parse_mode=ParseMode.HTML)
     
     elif query.data == "top_trading_tokens":
-        user_data[query.from_user.id] = "topTokens"
-        await query.edit_message_text("✏️ Enter an interval :\n   👉 Ex: 5 - 10")
+        await query.edit_message_text("🚀 Top Trading Tokens :", reply_markup=markup.top_trading_tokens_markup())
 
     elif query.data == "trading_settings":
         await query.edit_message_text("⚙️ Trading Settings :", reply_markup=markup.trading_settings_markup())
@@ -37,6 +36,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         if query.data in ["display_settings", "update_settings", "start_menu"]:
             await settings_handler(query)
+        
+        elif query.data in ["low_mcap", "moyen_mcap", "high_mcap"]:
+            user_data[query.from_user.id] = query.data
+            await query.edit_message_text("✏️ Enter an interval :\n   👉 Ex: 5 - 10")
         
         elif query.data in ["update_sl", "update_tp"]:
             await trade_settings_handler(query)
@@ -55,7 +58,7 @@ async def settings_handler(query: CallbackQuery):
     elif query.data == "start_menu":
         msg = "🤔 What would you like to do ?"
         await query.edit_message_text(msg, reply_markup=markup.start_markup())
-
+    
 
 async def trade_settings_handler(query: CallbackQuery):
     if query.data == "update_sl":
@@ -94,13 +97,13 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except ValueError:
             await update.message.reply_text("⚠️ Please enter a valid number.")
     
-    elif choice == "topTokens":
+    elif choice in ["low_mcap", "moyen_mcap", "high_mcap"]:
         inf, sup = msg.replace(" ", "").split('-')
         try:
             inf, sup = int(inf), int(sup)
             if 0 < inf < sup <= 100:
                 top_tokens = cache_manager.load_top_trading_pools_cache()
-                msg = messages.top_trading_tokens_msg(top_tokens, inf, sup)
+                msg = messages.top_trading_tokens_msg(top_tokens, inf, sup, choice)
                 await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
                 del user_data[user_id]
             else:

@@ -9,9 +9,16 @@ def display_trade_settings() -> str:
     tp = trading_params.get("takeProfit", 0) * 100
     return f"🔧 Actual Trading Settings :\n\n🔴 Stop Loss : -{sl}%\n🟢 Take Profit : +{tp}%"
 
-def top_trading_tokens_msg(top_tokens, start: int = 1, end: int = 100) -> str:
+def top_trading_tokens_msg(top_tokens, start: int = 1, end: int = 100, mcp_type: str = None) -> str:
     if not top_tokens:
         return "⚠️ No data found. Retry later."
+    
+    if mcp_type:
+        mcp_filter = {'low_mcap': (0, 5_000_000), 
+                      'moyen_mcap': (5_000_000, 50_000_000), 
+                      'high_mcap': (50_000_000, float('inf'))}
+        top_tokens = [token for token in top_tokens if mcp_filter[mcp_type][0] < token["mcp"] <= mcp_filter[mcp_type][1]]
+
     top_tokens = sorted(top_tokens, key=lambda d: d["appearance"], reverse=True)
     msg = f"🔥​ TOP TRADING TOKENS from the position {start} to {end}:\n\n"
     i = start
