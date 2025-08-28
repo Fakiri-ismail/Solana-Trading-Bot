@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from exchanges.jupiter import pro
+from exchanges.jupiter import data_api
 from database.db_sync import cache_manager
 from telegram_bots.hunter.messenger import HunterBot
 from telegram_bots.hunter import messages
@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     # Retry fetching data
     for i in range(3):
-        pools = pro.get_toptrending(timeframe='1h', params=params).get('pools', {})
+        pools = data_api.get_toptrending(timeframe='1h', params=params).get('pools', {})
         if pools:
             break
         logging.warning(f"No pools found : Retry {i + 1} ")
