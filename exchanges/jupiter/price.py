@@ -28,8 +28,11 @@ def get_price(mint: str, vs_token: str =USDC) -> float:
     try:
         response = requests.get(url)
         response.raise_for_status()
-        price = response.json().get("data", {}).get(mint, {}).get("price", 0) 
-        return float(price)
+        if response.json():
+            price = response.json().get("data", {}).get(mint, {}).get("price", 0)
+            return float(price)
+        else:
+            return 0
     except requests.RequestException as e:
         logging.error(f"JUP API : Error fetching '{mint}' price\n >> {e}")
         return 0
