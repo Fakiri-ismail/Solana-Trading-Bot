@@ -1,4 +1,4 @@
-import requests, base58, asyncio, logging
+import requests, base58, asyncio, logging, sys
 
 from solders.keypair import Keypair
 from solders.pubkey import Pubkey
@@ -18,8 +18,12 @@ class WalletManager():
 
     def get_sol_balance(self) -> int:
         """Get wallet SOL balance"""
-        balance = self.client.get_balance(Pubkey.from_string(self.public_key))
-        return balance.value
+        try:
+            balance = self.client.get_balance(Pubkey.from_string(self.public_key))
+            return balance.value
+        except Exception as e:
+            logging.error(f"Solana Balance not found\n >> {e}")
+            sys.exit(1)
 
     def get_assets(self, RPC_URL: str = HELIUS_RPC) -> list:
         """Get all tokens in the wallet"""
