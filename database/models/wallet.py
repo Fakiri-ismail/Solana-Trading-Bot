@@ -19,6 +19,7 @@ class WalletToken:
     id: Optional[int] = None
     mint: str = ""
     symbol: str = ""
+    balance: int = 0
     buy_price: Optional[Decimal] = None
     usdt_value: Decimal = Decimal('0')
 

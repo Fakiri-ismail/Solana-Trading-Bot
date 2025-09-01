@@ -4,16 +4,16 @@ from database.connection import get_cursor
 from database.models.wallet import WalletToken
 
 
-def insert_wallet_token(mint: str, symbol: str, usdt_value: Decimal = None,
+def insert_wallet_token(mint: str, symbol: str, balance: int, usdt_value: Decimal = None,
                         buy_price: Optional[Decimal] = None) -> int:
     with get_cursor() as cursor:
         cursor.execute(
             """
-            INSERT INTO wallet_token (mint, symbol, buy_price, usdt_value)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO wallet_token (mint, symbol, buy_price, usdt_value, balance)
+            VALUES (%s, %s, %s, %s, %s)
             RETURNING id
             """,
-            (mint, symbol, buy_price, usdt_value)
+            (mint, symbol, buy_price, usdt_value, balance)
         )
         return cursor.fetchone()['id']
 
@@ -34,6 +34,7 @@ def get_wallet_token(mint: str = None) -> Optional[WalletToken]:
                 id=data['id'],
                 mint=data['mint'],
                 symbol=data['symbol'],
+                balance=data['balance'],
                 buy_price=data['buy_price'],
                 usdt_value=data['usdt_value']
             )
@@ -54,6 +55,7 @@ def get_all_wallet_tokens() -> List[WalletToken]:
                 id=row['id'],
                 mint=row['mint'],
                 symbol=row['symbol'],
+                balance=row['balance'],
                 buy_price=row['buy_price'],
                 usdt_value=row['usdt_value']
             )
@@ -62,7 +64,7 @@ def get_all_wallet_tokens() -> List[WalletToken]:
 
 
 def update_wallet_token(token_id: int = None, mint: str = None, usdt_value: Decimal = None,
-                       symbol: str = None, buy_price: Decimal = None) -> bool:
+                       symbol: str = None, balance: int = None, buy_price: Decimal = None) -> bool:
     if token_id is None and mint is None:
         raise ValueError("You must provide either token_id or mint")
     
@@ -78,7 +80,10 @@ def update_wallet_token(token_id: int = None, mint: str = None, usdt_value: Deci
     if buy_price is not None:
         update_fields.append("buy_price = %s")
         params.append(buy_price)
-        
+    if balance is not None:
+        update_fields.append("balance = %s")
+        params.append(balance)
+
     if not update_fields:
         return False
     
