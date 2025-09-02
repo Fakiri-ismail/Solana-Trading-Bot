@@ -1,8 +1,10 @@
 import requests, logging
 from typing import List
+from construct import Container
 from solders.pubkey import Pubkey
 from solders.signature import Signature
 from solana.rpc.api import Client
+from spl.token._layouts import MINT_LAYOUT
 from global_config import SOL_URI, HELIUS_API, HELIUS_API_KEY, WSOL, USDC
 
 
@@ -181,6 +183,25 @@ def get_swap_data(tx_signature: str) -> dict:
         "tokenInput": token_input,
         "tokenOutput": token_output
     }
+
+
+def get_token_info(mint: str) -> Container:
+    """
+    return token info : 
+        mint_authority_option : 0 means Token not mintable | 1 means Token mintable
+        mint_authority : The public key of the mint authority
+        supply : Total supply 
+        decimals :
+        is_initialized : 1 means that the mint account is ready for use
+        freeze_authority_option : 0 means there is no freeze authority | 1 means there is freeze authority
+        freeze_authority : The public key of the freeze authority,
+    """
+    mint_pubkey = Pubkey.from_string(mint)
+    mint_info = sol_client.get_account_info(mint_pubkey, commitment="confirmed")
+    if not mint_info or mint_info.value is None:
+        raise ValueError(f"Mint address '{mint}' not found")
+
+    return MINT_LAYOUT.parse(mint_info.value.data)
 
 
 if __name__ == "__main__":
