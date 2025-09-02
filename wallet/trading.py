@@ -51,16 +51,15 @@ async def trading_bot():
             # Swap the token
             result = await my_wallet.swap_token(in_mint=token["mint"], out_mint=WSOL, pct_amount=100)
             # Generate swap info
-            token_decimals = wallet_helpers.get_token_info(token["mint"]).decimals
-            token_usd_value = token_price * (token["balance"] / 10 ** token_decimals)
-            swap_info = generate_swap_info(result, buy_price, token_price, token["symbol"], token_usd_value)
+            token_info = {**token, "sell_price": token_price}
+            swap_info = generate_swap_info(result, token_info)
             if swap_info['swapData']:
                 trading_history_ops.create_trading_history(
                     mint=token["mint"],
                     symbol=token["symbol"], 
-                    usdt_value=swap_info["usdValue"],
                     buy_price=swap_info["buy_price"],
-                    sell_price=swap_info["sell_price"]
+                    sell_price=swap_info["sell_price"],
+                    usdt_value=swap_info["usdValue"]
                 )
 
             # Send telegram message
@@ -71,26 +70,26 @@ async def trading_bot():
     # cache_manager.sync_wallet_with_db()
 
 
-def generate_swap_info(swap_result, buy_price, sell_price, symbol, token_usd_value):
+def generate_swap_info(swap_result, token_info):
     swap_info ={
         "status": swap_result.get("status"),
         "transactionId": swap_result.get("tx_signature"),
-        "symbol": symbol,
+        "symbol": token_info["symbol"],
+        "buy_price": token_info["buy_price"],
+        "sell_price": token_info["sell_price"],
         "swapData": None,
+        "usdValue": 0
     }
-    if swap_result.get("status"):
+    if swap_info["status"]:
         # Get the swap data
         swap_data = wallet_helpers.get_swap_data(swap_result.get("tx_signature"))
         if swap_data:
             swap_info["swapData"] = swap_data
-            swap_info["buy_price"] = buy_price
-            swap_info["sell_price"] = sell_price
             try:
-                swap_sol_value = swap_data['tokenOutput']['amount'] / 10 ** swap_data['tokenOutput']['decimals']
-                swap_info["usdValue"] = round(swap_sol_value * sol_price, 3)
+                token_decimals = wallet_helpers.get_token_info(token_info["mint"]).decimals
+                swap_info["usdValue"]  = token_info["sell_price"] * (token_info["balance"] / 10 ** token_decimals)
             except Exception as e:
                 logging.error(f"Error calculating swap value:\n {e}")
-                swap_info["usdValue"] = token_usd_value
     
     return swap_info
 
