@@ -22,7 +22,8 @@ if __name__ == "__main__":
         'minNetVolume1h': 100,
         'minNumNetBuyers1h': 10,
         'minMcap': 800_000,
-        'maxMcap': 500_000_000
+        'maxMcap': 500_000_000,
+        'minHolderCount': 1_000
     }
 
     # Retry fetching data
