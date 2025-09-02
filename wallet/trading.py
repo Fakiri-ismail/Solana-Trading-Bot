@@ -89,7 +89,7 @@ async def trading_bot():
     cache_manager.save_wallet_cache(wallet_cache)
 
     # sync cache with database every hour
-    cache_manager.sync_wallet_with_db()
+    # cache_manager.sync_wallet_with_db()
 
 
 def generate_swap_info(swap_result, buy_price, actual_price, symbol, token_usd_value):
