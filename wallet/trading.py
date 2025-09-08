@@ -67,7 +67,7 @@ async def trading_bot():
             hunter.send_swap_message(swap_info)
 
     # sync cache with database every 3 hours
-    # cache_manager.sync_wallet_with_db()
+    cache_manager.sync_wallet_with_db(wallet_cache, iteration_time=10800)
 
 
 def generate_swap_info(swap_result, token_info):

@@ -109,16 +109,13 @@ def update_last_sync_time(field):
         json.dump(data, f, indent=4)
 
 # Sync Database    
-def sync_wallet_with_db():
+def sync_wallet_with_db(wallet_cache: list, iteration_time: int):
     """
     Sync the database with the local wallet cache.
     """
     wallet_last_sync = get_last_sync_time('wallet')
     if wallet_last_sync:
-        if (datetime.now() - wallet_last_sync).total_seconds() > 10800:  # 3 hours
-            # Load the wallet cache
-            wallet_cache = load_wallet_cache()
-
+        if (datetime.now() - wallet_last_sync).total_seconds() > iteration_time:
             # Clear wallet_token table
             wallet_tokens_ops.delete_all_wallet_tokens()
 
