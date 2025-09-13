@@ -5,6 +5,7 @@ from database.db_sync import cache_manager
 from database.crud.wallet import wallet_history_ops, trading_history_ops
 from exchanges.jupiter.price import getJupPrice
 from telegram_bots.hunter.messenger import HunterBot
+from helpers import wallet_helpers
 from global_config import WSOL, USDC
 
 
@@ -79,27 +80,31 @@ def wallet_tokens_report():
         return "❌ No data found."
 
     data = []
+    wallet_value = 0
     for token in wallet_tokens_data:
-        if token['mint'] in [WSOL, USDC]:
-            continue
         token_price = getJupPrice(token["mint"])
         if not token_price:
             continue
+
+        token_decimals = wallet_helpers.get_token_info(token["mint"]).decimals
+        token_value = token_price * (token["balance"] / 10 ** token_decimals)
         data.append({
             "mint": token['mint'],
             "symbol": token['symbol'],
+            "value": token_value,
             "pnl_pct": (token_price - token['buy_price']) / token['buy_price'] * 100
         })
+        wallet_value += token_value
     sorted_data = sorted(data, key=lambda x: x["pnl_pct"], reverse=True)
 
-    msg = '📊 Wallet Report:\n'
+    msg = f'📊 Wallet Report\n'
     for token in sorted_data:
-        moji = "🟢" if token['pnl_pct'] >= 0 else "🔴"
+        emoji = "🟢" if token['pnl_pct'] >= 0 else "🔴"
+        sign = "+" if token['pnl_pct'] >= 0 else ""
         dex_url = f"https://dexscreener.com/solana/{token['mint']}"
-        msg += f"- {moji} <b><a href='{dex_url}'>{token['symbol']}</a></b> : <b>{token['pnl_pct']:.2f}%</b>\n"
-    
-    if msg == '📊 Wallet Report:\n':
-        msg += "❌ No SPL tokens found in the wallet."
+        msg += f"- {emoji} <b><a href='{dex_url}'>{token['symbol']}</a></b> : {token['value']:.2f}$  ({sign}{token['pnl_pct']:.1f}%)\n"
+
+    msg += f"💰 Total: <b>{wallet_value:.2f}$</b>\n"
 
     return msg
     
