@@ -54,14 +54,14 @@ class HunterBot:
 
             token_output = swap_info['swapData']['tokenOutput']
             out_amount = token_output['amount'] / 10 ** token_output['decimals']
-            msg += f"💰 Amount : <b>{round(out_amount, 3)} SOL</b>\n"
-            msg += f"💵 Value : <b>{swap_info['usdValue']}$</b>\n"
+            msg += f"💰 Amount : <b>{out_amount:.3f} SOL</b>\n"
+            msg += f"💵 Value : <b>{swap_info['usdValue']:.2f}$</b>\n"
 
-            pnl_pct = round(((swap_info['sell_price'] - swap_info['buy_price']) / swap_info['buy_price']) * 100, 2)
-            inv_value = round(swap_info['usdValue'] / (1 + (pnl_pct / 100)), 3)
-            pnl = round(swap_info['usdValue'] - inv_value, 3)
+            pnl_pct = ((swap_info['sell_price'] - swap_info['buy_price']) / swap_info['buy_price']) * 100
+            inv_value = swap_info['usdValue'] / (1 + (pnl_pct / 100))
+            pnl = swap_info['usdValue'] - inv_value
             emoji = "🟢" if pnl > 0 else "🔴"
-            msg += f"{emoji} PNL : <b>{pnl}$</b> (<b>{pnl_pct}%</b>)\n"
+            msg += f"{emoji} PNL : <b>{pnl:.2f}$</b> (<b>{pnl_pct:.2f}%</b>)\n"
 
             mint = swap_info['swapData']['tokenInput']['mint']
             msg += f"<code>{mint}</code>\n"
