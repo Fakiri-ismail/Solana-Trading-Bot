@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from exchanges.jupiter import data_api
-from database.db_sync import cache_manager
+from database.cache import cache_manager
 from telegram_bots.hunter.messenger import HunterBot
 from telegram_bots.hunter import messages
 from helpers import utils

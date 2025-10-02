@@ -3,7 +3,7 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 from telegram_bots.hunter import markup, messages
-from database.db_sync import cache_manager
+from database.cache import cache_manager
 from helpers import json_helpers
 from wallet import report
 

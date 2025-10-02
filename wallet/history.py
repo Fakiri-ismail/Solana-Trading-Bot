@@ -2,7 +2,7 @@ import logging
 from wallet import report
 from wallet.manager import WalletManager
 from database.crud.wallet.wallet_history_ops import create_wallet_history
-from exchanges.jupiter.price import getJupPrice
+from exchanges.jupiter.price import get_price
 from helpers.utils import setup_logging
 from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL
 
@@ -21,7 +21,7 @@ def add_wallet_history_record_to_db() -> int:
         token_mint = token.get("mint", "")
 
         # Token USD Value
-        token_price = getJupPrice(token_mint)
+        token_price = get_price(token_mint)
         if not token_price:
             token_symbol = token.get("symbol", "")
             logging.warning(f"JUP API : '{token_symbol}' price not found ({token_mint})")
@@ -30,7 +30,7 @@ def add_wallet_history_record_to_db() -> int:
         # Wallet USD Value
         wallet_usd_value += token_usd_value
     
-    sol_price = getJupPrice(WSOL)
+    sol_price = get_price(WSOL)
     if not sol_price:
         logging.warning("JUP API : Solana price not found")
     wallet_sol_value = wallet_usd_value / sol_price

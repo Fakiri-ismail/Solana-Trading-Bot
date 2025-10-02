@@ -1,9 +1,9 @@
 import asyncio, logging, sys
 from telegram_bots.hunter.messenger import HunterBot
 from wallet.manager import WalletManager
-from database.db_sync import cache_manager
+from database.cache import cache_manager
 from database.crud.wallet import trading_history_ops
-from exchanges.jupiter.price import getJupPrice
+from exchanges.jupiter.price import get_price
 from helpers import json_helpers, utils, wallet_helpers
 from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY, WSOL, USDC
 
@@ -19,7 +19,7 @@ if not trading_params:
     trading_params = {"stopLoss": 0.5, "takeProfit": 0.8}  # Default values
 
 
-sol_price = getJupPrice(WSOL)
+sol_price = get_price(WSOL)
 if not sol_price:
     logging.error("JUP API : Solana price not found")
     sys.exit(1)
@@ -42,7 +42,7 @@ async def trading_bot():
         take_profit_price = buy_price * (1 + trading_params["takeProfit"])
         stop_loss_price = buy_price * (1 - trading_params["stopLoss"])
 
-        token_price = getJupPrice(token["mint"])
+        token_price = get_price(token["mint"])
         if not token_price:
             continue
 

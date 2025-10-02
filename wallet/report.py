@@ -1,9 +1,9 @@
 import calendar, logging
 import matplotlib.pyplot as plt
 from datetime import datetime
-from database.db_sync import cache_manager
+from database.cache import cache_manager
 from database.crud.wallet import wallet_history_ops, trading_history_ops
-from exchanges.jupiter.price import getJupPrice
+from exchanges.jupiter.price import get_price
 from telegram_bots.hunter.messenger import HunterBot
 from helpers import wallet_helpers
 from global_config import WSOL, USDC
@@ -82,7 +82,7 @@ def wallet_tokens_report():
     data = []
     wallet_value = 0
     for token in wallet_tokens_data:
-        token_price = getJupPrice(token["mint"])
+        token_price = get_price(token["mint"])
         if not token_price:
             continue
 
