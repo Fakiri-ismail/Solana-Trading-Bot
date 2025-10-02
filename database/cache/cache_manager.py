@@ -2,15 +2,15 @@ import os, json
 from datetime import datetime
 from helpers import json_helpers
 from wallet.manager import WalletManager
-from exchanges.jupiter.price import getJupPrice
+from exchanges.jupiter.price import get_price
 from database.crud.wallet import wallet_tokens_ops
 from database.crud.tokens import top_trading_tokens_ops
 from global_config import WALLET_PRIV_KEY, WALLET_PUB_KEY
 
 
-WALLET_CACHE_FILE = "database/db_sync/wallet_cache.json"
-TOP_TRADING_CACHE_FILE = "database/db_sync/top_trading_cache.json"
-LAST_UPDATE_FILE = "database/db_sync/last_update.json"
+WALLET_CACHE_FILE = "database/cache/wallet_cache.json"
+TOP_TRADING_CACHE_FILE = "database/cache/top_trading_cache.json"
+LAST_UPDATE_FILE = "database/cache/last_update.json"
 
 # Wallet cache
 def load_wallet_cache() -> list:
@@ -47,7 +47,7 @@ def update_wallet_cache(wallet_cache: list):
             cache_token = next((t for t in wallet_cache if t["mint"] == token["mint"]), None)
             # Check Balance
             if cache_token['balance'] != token['balance']:
-                actual_price = getJupPrice(token["mint"])
+                actual_price = get_price(token["mint"])
                 if not actual_price:
                     continue
 
@@ -62,7 +62,7 @@ def update_wallet_cache(wallet_cache: list):
                 cache_token['buy_price'] = new_buy_price
                 cache_token['usdt_value'] = new_buy_price * (token['balance'] / 10 ** token["decimals"])
         else:
-            buy_price = getJupPrice(token["mint"])
+            buy_price = get_price(token["mint"])
             if not buy_price:
                 continue
             wallet_cache.append({
