@@ -1,13 +1,10 @@
 import calendar, logging
 import matplotlib.pyplot as plt
 from datetime import datetime
-from database.cache import cache_manager
 from database.crud.wallet import wallet_history_ops, trading_history_ops
-from exchanges.jupiter.price import get_price
+from exchanges.jupiter import data_api
 from telegram_bots.hunter.messenger import HunterBot
-from helpers import wallet_helpers
-from global_config import WSOL, USDC
-
+from global_config import WSOL
 
 
 def wallet_history_report(start_date: datetime, end_date: datetime):
@@ -74,38 +71,41 @@ def trading_history_report(start_date: datetime, end_date: datetime):
     return round(win_rate, 2)
 
 def wallet_tokens_report():
-    wallet_tokens_data = cache_manager.load_wallet_cache()
-    if not wallet_tokens_data:
-        logging.warning("No data found in wallet cache file.")
-        return "❌ No data found."
-
+    # Get Wallet Data
+    wallet_data = data_api.get_wallet_data()
+    if not wallet_data:
+        return "❌ No data found. (Jupiter API issue)"
+    
     data = []
-    wallet_value = 0
-    for token in wallet_tokens_data:
-        token_price = get_price(token["mint"])
-        if not token_price:
+    wallet_value, sol_balance, sol_price = 0, 0, 0
+    for mint, info in wallet_data.items():
+        if mint == 'So11111111111111111111111111111111111111111':
+            sol_balance = info.get("balance", {}).get("balance", 0)
             continue
-
-        token_decimals = wallet_helpers.get_token_info(token["mint"]).decimals
-        token_value = token_price * (token["balance"] / 10 ** token_decimals)
+        if mint == WSOL:
+            sol_price = info.get("price", {}).get("usdPrice", 0)
+            continue
         data.append({
-            "mint": token['mint'],
-            "symbol": token['symbol'],
-            "value": token_value,
-            "pnl_pct": (token_price - token['buy_price']) / token['buy_price'] * 100
+            "mint": mint,
+            "symbol": data_api.search(mint).get("symbol", ""),
+            "value": info.get("balance", {}).get("balanceValue", 0),
+            "pnl": info.get("pnl", {}).get("unrealizedPnl", 0),
+            "pnlPercentage": info.get("pnl", {}).get("unrealizedPnlPercentage", 0)
         })
-        wallet_value += token_value
-    sorted_data = sorted(data, key=lambda x: x["pnl_pct"], reverse=True)
+        wallet_value += info.get("balance", {}).get("balanceValue", 0)
+    wallet_value += sol_balance * sol_price
+
+    sorted_data = sorted(data, key=lambda x: x["pnlPercentage"], reverse=True)
 
     msg = f'📊 Wallet Report\n'
     for token in sorted_data:
-        emoji = "🟢" if token['pnl_pct'] >= 0 else "🔴"
-        sign = "+" if token['pnl_pct'] >= 0 else ""
+        emoji = "🟢" if token['pnlPercentage'] >= 0 else "🔴"
+        sign = "+" if token['pnlPercentage'] >= 0 else ""
         dex_url = f"https://dexscreener.com/solana/{token['mint']}"
-        msg += f"- {emoji} <b><a href='{dex_url}'>{token['symbol']}</a></b> : {token['value']:.2f}$  ({sign}{token['pnl_pct']:.1f}%)\n"
+        msg += f"- {emoji} <b><a href='{dex_url}'>{token['symbol']}</a></b> : {token['value']:.2f}$  ({sign}{token['pnlPercentage']:.1f}%)\n"
 
+    msg += f"\n🟣 SOL balance : <b>{sol_balance:.4f} ({round(sol_balance * sol_price, 1)}$)</b>\n"
     msg += f"💰 Total: <b>{wallet_value:.2f}$</b>\n"
-
     return msg
     
 
