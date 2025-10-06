@@ -87,7 +87,7 @@ def wallet_tokens_report():
             continue
         data.append({
             "mint": mint,
-            "symbol": data_api.search(mint).get("symbol", ""),
+            "symbol": data_api.search(mint).get("symbol", "NONE"),
             "value": info.get("balance", {}).get("balanceValue", 0),
             "pnl": info.get("pnl", {}).get("unrealizedPnl", 0),
             "pnlPercentage": info.get("pnl", {}).get("unrealizedPnlPercentage", 0)
