@@ -97,7 +97,7 @@ def wallet_tokens_report():
 
     sorted_data = sorted(data, key=lambda x: x["pnlPercentage"], reverse=True)
 
-    msg = f'📊 Wallet Report\n'
+    msg = f'📊 Wallet Report\n\n'
     for token in sorted_data:
         emoji = "🟢" if token['pnlPercentage'] >= 0 else "🔴"
         sign = "+" if token['pnlPercentage'] >= 0 else ""
