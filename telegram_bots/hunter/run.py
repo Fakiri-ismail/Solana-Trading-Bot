@@ -1,11 +1,15 @@
 import os, dotenv
+from helpers import utils
 from telegram_bots.hunter import handlers
-from telegram.ext import (Application, CommandHandler, CallbackQueryHandler, 
-                          MessageHandler, filters)
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler
+from telegram.ext import MessageHandler, filters
 
 
 dotenv.load_dotenv()
 HUNTER_BOT_TOKEN = os.getenv('HUNTER_BOT_TOKEN')
+
+# Init logging
+utils.setup_logging('logs/hunter.log')
 
 if __name__ == "__main__":
     app = Application.builder().token(HUNTER_BOT_TOKEN).build()
