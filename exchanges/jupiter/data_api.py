@@ -5,7 +5,7 @@ from global_config import WALLET_PUB_KEY
 
 base_url = "https://datapi.jup.ag/v1"
 
-def get_toptrending(timeframe: str='24h', params: dict = {}) -> dict:
+def get_toptrending(timeframe: str='24h', params: dict = {}) -> list:
     """
     Get the top trending pools from Jupiter API ().
         :timeframe: Value can be '5m', '1h', '6h' or '24h'
@@ -24,7 +24,7 @@ def get_toptrending(timeframe: str='24h', params: dict = {}) -> dict:
         :return: A dictionary containing the top trending pools.
     """
     params = {**params, 'mintAuthorityDisabled': 'true', 'freezeAuthorityDisabled': 'true'}
-    url = f'{base_url}/pools/toptrending/{timeframe}?'
+    url = f'{base_url}/assets/toptrending/{timeframe}?'
     headers = {'User-Agent': utils.get_random_user_agent()}
     try:
         response = requests.get(url, params=params, headers=headers)
@@ -32,7 +32,7 @@ def get_toptrending(timeframe: str='24h', params: dict = {}) -> dict:
         return response.json()
     except requests.RequestException as e:
         logging.error(f"JUP API : Error fetching top trending pools\n >> {e}")
-        return {}
+        return []
 
 def search(query: str) -> list:
     """
