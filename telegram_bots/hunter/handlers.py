@@ -98,11 +98,12 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("⚠️ Please enter a valid number.")
     
     elif choice in ["low_mcap", "moyen_mcap", "high_mcap"]:
-        inf, sup = msg.replace(" ", "").split('-')
+        interval = msg.replace(" ", "").split('-')
+        inf, sup = interval if len(interval) == 2 else (1, interval[0])
         try:
             inf, sup = int(inf), int(sup)
             if 0 < inf < sup <= 100:
-                top_tokens = cache_manager.load_top_trading_pools_cache()
+                top_tokens = cache_manager.load_top_trading_assets_cache()
                 msg = messages.top_trading_tokens_msg(top_tokens, inf, sup, choice)
                 await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
                 del user_data[user_id]
