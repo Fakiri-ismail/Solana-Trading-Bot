@@ -79,12 +79,12 @@ def update_wallet_cache(wallet_cache: list):
 def save_wallet_cache(wallet_cache):
     json_helpers.write_json_file(WALLET_CACHE_FILE, wallet_cache)
 
-# Top Trading pools cache
-def load_top_trading_pools_cache():
-    top_trading_pools = json_helpers.read_json_file(TOP_TRADING_CACHE_FILE)
-    return top_trading_pools if top_trading_pools else []
+# Top Trading assets cache
+def load_top_trading_assets_cache():
+    top_trading_assets = json_helpers.read_json_file(TOP_TRADING_CACHE_FILE)
+    return top_trading_assets if top_trading_assets else []
 
-def save_top_trading_pools_cache(top_trading_data):
+def save_top_trading_assets_cache(top_trading_data):
     json_helpers.write_json_file(TOP_TRADING_CACHE_FILE, top_trading_data)
 
 # Sync Time
@@ -133,14 +133,14 @@ def sync_wallet_with_db(wallet_cache: list, iteration_time: int):
     else:
         update_last_sync_time('wallet')
 
-def sync_top_trading_pools_with_db(top_trading_tokens: list):
+def sync_top_trading_assets_with_db(top_trading_tokens: list):
     """
-    Sync the database with the local top trading pools cache.
+    Sync the database with the local top trading assets cache.
     """
     top_trading_last_sync = get_last_sync_time('top_trading_db')
     if top_trading_last_sync:
         if (datetime.now() - top_trading_last_sync).days > 0:
-            # Sync top trading pools cache with database
+            # Sync top trading assets cache with database
             top_10 = sorted(top_trading_tokens, key=lambda d: d["appearance"], reverse=True)[:10]
             top_trading_tokens_ops.insert_top_trading_tokens(top_10)
             # Clear the cache

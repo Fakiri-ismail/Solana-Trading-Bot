@@ -1,0 +1,65 @@
+[
+    {
+        "mint": "FNP2Dw2GU5wPBZgVCcerbEemV9dVfvQrThEor1jmoon",
+        "symbol": "MOONCAT",
+        "balance": 1552768679,
+        "buy_price": 0.0034497406974757132,
+        "usdt_value": 5.356649305711902
+    },
+    {
+        "mint": "DAfKg6exaeMMUQeqwRq3UP5KYPJjFNyVuVzFfr4kpump",
+        "symbol": "PICKLE",
+        "balance": 539492140,
+        "buy_price": 0.007957806468624623,
+        "usdt_value": 4.29317404146414
+    },
+    {
+        "mint": "8SBLocBKKwTP44YvygWRHXoWBFR2pVRYfy22VJxzpump",
+        "symbol": "SLEAZE",
+        "balance": 2810894022,
+        "buy_price": 0.00109255,
+        "usdt_value": 3.07104179
+    },
+    {
+        "mint": "So11111111111111111111111111111111111111112",
+        "symbol": "WSOL",
+        "balance": 189393869,
+        "buy_price": 235.30948714582166,
+        "usdt_value": 44.56617418295293
+    },
+    {
+        "mint": "GvV7sFu6FHJsSVXfpG7xqFnWar3c7YkcC74rqe7Bpump",
+        "symbol": "RAGEGUY",
+        "balance": 1962086173,
+        "buy_price": 0.0023715765339284113,
+        "usdt_value": 4.653237525432201
+    },
+    {
+        "mint": "6d2Wze1KMUxQ28sFLrH9DKfgBXpUJSJYZaRbufucvBLV",
+        "symbol": "LOS",
+        "balance": 1923308124177,
+        "buy_price": 0.00191526783776621,
+        "usdt_value": 3.683650192350668
+    },
+    {
+        "mint": "HanwWd7qa9wBwmE223rTdACRgoSppkrMhQoCmHLypump",
+        "symbol": "CCM",
+        "balance": 2716720772,
+        "buy_price": 0.0013570691331255724,
+        "usdt_value": 3.6867779030022763
+    },
+    {
+        "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "symbol": "USDC",
+        "balance": 40021170,
+        "buy_price": 1.0,
+        "usdt_value": 40.02117
+    },
+    {
+        "mint": "J2eaKn35rp82T6RFEsNK9CLRHEKV9BLXjedFM3q6pump",
+        "symbol": "FTP",
+        "balance": 699040329,
+        "buy_price": 0.008139135475329844,
+        "usdt_value": 5.689583940450146
+    }
+]
