@@ -141,8 +141,8 @@ def sync_top_trading_assets_with_db(top_trading_tokens: list):
     if top_trading_last_sync:
         if (datetime.now() - top_trading_last_sync).days > 0:
             # Sync top trading assets cache with database
-            top_10 = sorted(top_trading_tokens, key=lambda d: d["appearance"], reverse=True)[:10]
-            top_trading_tokens_ops.insert_top_trading_tokens(top_10)
+            top_30 = sorted(top_trading_tokens, key=lambda d: d["appearance"], reverse=True)[:30]
+            top_trading_tokens_ops.insert_top_trading_tokens(top_30)
             # Clear the cache
             json_helpers.delete_file(TOP_TRADING_CACHE_FILE)
             # Update the last sync time
